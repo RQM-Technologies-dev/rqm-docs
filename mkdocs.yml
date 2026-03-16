@@ -45,6 +45,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Ecosystem: ecosystem.md
+  - Quickstart: quickstart.md
   - Install: installation.md
   - Concepts:
       - Quaternion Intuition: concepts/quaternion-intuition.md
