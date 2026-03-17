@@ -1,6 +1,6 @@
 # Architecture
 
-This page explains the layering and dependency philosophy of the RQM ecosystem, and why the stack is organized the way it is.
+This page explains the layering and dependency philosophy of the RQM platform, and why the stack is organized the way it is.
 
 ---
 
@@ -8,39 +8,69 @@ This page explains the layering and dependency philosophy of the RQM ecosystem, 
 
 ### 1. Canonical math lives in `rqm-core`
 
-`rqm-core` is the single source of truth for all quaternion algebra, spinor representations, Bloch vector geometry, and SU(2) group operations. No other repository in the ecosystem duplicates this logic.
+`rqm-core` is the single source of truth for all quaternion algebra, spinor representations, Bloch vector geometry, and SU(2) group operations. No other package in the platform duplicates this logic.
 
 If you need to compute a spinor normalization, convert to a Bloch vector, or construct an SU(2) rotation matrix — that implementation belongs in `rqm-core`.
 
-### 2. Execution lives in `rqm-qiskit`
+### 2. Compilation lives in `rqm-compiler`
 
-`rqm-qiskit` is the bridge between the mathematical abstractions in `rqm-core` and the Qiskit circuit framework. It does not re-implement math; it maps it.
+`rqm-compiler` is the bridge between the math layer and execution backends. It accepts backend-agnostic programs and produces a normalized instruction set that any backend can consume.
 
-State preparation, gate construction, and simulator interaction belong here. The dependency direction is strictly one way: `rqm-qiskit` imports from `rqm-core`, never the reverse.
+The compiler resolves logical gate names to explicit unitary matrices using `rqm-core` primitives. It applies normalization passes to ensure the IR is backend-ready. Backends do not perform gate resolution — that work is done once at the compiler level.
 
-### 3. Teaching lives in `rqm-notebooks`
+### 3. Execution lives in the backend packages
 
-`rqm-notebooks` provides the guided learning experience. Notebooks demonstrate how to use both `rqm-core` and `rqm-qiskit` together to explore quantum geometry and run circuits.
+`rqm-qiskit` and `rqm-braket` are execution backends. They translate the compiler IR into their respective native circuit formats and run them on simulators or hardware.
 
-Notebooks are allowed to be exploratory and pedagogical, but they do not define new math or new library functions.
+Neither backend reimplements math or compilation logic. They each implement the same interface contract, which is why the same program runs on either backend without modification.
 
 ### 4. Documentation lives in `rqm-docs`
 
-`rqm-docs` (this site) organizes and explains the ecosystem. It does not introduce new algorithms, theory, or notebook content. Its job is to make everything else discoverable, understandable, and usable.
+`rqm-docs` (this site) organizes and explains the platform. It does not introduce new algorithms, theory, or notebook content. Its job is to make everything else discoverable, understandable, and usable.
+
+---
+
+## Compiler-First Pipeline
+
+The full lowering path from program to result:
+
+```
+RQMGate list
+    │
+    ▼
+rqm-compiler
+  (normalize gates, resolve matrices, produce IR)
+    │
+    ├──────────────────┐
+    ▼                  ▼
+rqm-qiskit        rqm-braket
+(Qiskit circuit)  (Braket circuit)
+    │                  │
+    ▼                  ▼
+simulator/hardware  simulator/hardware
+    │                  │
+    ▼                  ▼
+result.counts      result.counts
+```
+
+The program is defined once. The compiler processes it once. Execution backends are interchangeable.
 
 ---
 
 ## Dependency Graph
 
 ```
-rqm-notebooks ──► rqm-qiskit ──► rqm-core
-                       └─────────────► rqm-core
+rqm-braket  ──► rqm-compiler ──► rqm-core
+rqm-qiskit  ──► rqm-compiler ──► rqm-core
+rqm-notebooks ──► rqm-qiskit, rqm-braket
 ```
 
 - `rqm-core` has no ecosystem dependencies.
-- `rqm-qiskit` depends on `rqm-core`.
-- `rqm-notebooks` depends on both `rqm-core` and `rqm-qiskit`.
-- `rqm-docs` references all three but has no runtime dependency on any of them.
+- `rqm-compiler` depends on `rqm-core`.
+- `rqm-qiskit` depends on `rqm-compiler` (and transitively `rqm-core`).
+- `rqm-braket` depends on `rqm-compiler` (and transitively `rqm-core`).
+- `rqm-notebooks` depends on the execution backends.
+- `rqm-docs` references all packages but has no runtime dependency on any of them.
 
 ---
 
@@ -49,35 +79,39 @@ rqm-notebooks ──► rqm-qiskit ──► rqm-core
 | Layer | Repository | Responsibility |
 |---|---|---|
 | Math | `rqm-core` | Defines canonical representations and operations |
-| Execution | `rqm-qiskit` | Maps math to Qiskit circuits and simulators |
-| Learning | `rqm-notebooks` | Teaches and demonstrates the ecosystem through notebooks |
+| Compiler | `rqm-compiler` | Normalizes programs to a backend-agnostic IR |
+| Execution | `rqm-qiskit` | Maps IR to Qiskit circuits and simulators |
+| Execution | `rqm-braket` | Maps IR to Braket circuits and simulators |
+| Learning | `rqm-notebooks` | Teaches and demonstrates the platform through notebooks |
 | Documentation | `rqm-docs` | Explains, organizes, and guides users |
 
 ---
 
 ## What Belongs Where
 
-| Content Type | Correct Repository |
+| Content Type | Correct Package |
 |---|---|
 | Quaternion multiplication | `rqm-core` |
 | Bloch vector conversion | `rqm-core` |
 | SU(2) matrix construction | `rqm-core` |
-| Qiskit gate from spinor | `rqm-qiskit` |
-| Circuit execution helpers | `rqm-qiskit` |
-| State vector extraction | `rqm-qiskit` |
+| Gate normalization and IR lowering | `rqm-compiler` |
+| Qiskit circuit from IR | `rqm-qiskit` |
+| Braket circuit from IR | `rqm-braket` |
+| Circuit execution helpers | `rqm-qiskit` / `rqm-braket` |
 | Tutorial notebook | `rqm-notebooks` |
 | Concept explanation | `rqm-docs` |
 | API reference guide | `rqm-docs` |
 
 ---
 
-## Why Not One Big Repo?
+## Why This Architecture?
 
-Separating concerns across repositories gives each layer a clear scope:
+Separating math, compilation, and execution into distinct layers provides concrete benefits:
 
-- It keeps `rqm-core` dependency-light and testable in isolation.
-- It allows `rqm-qiskit` to evolve with Qiskit without touching the math.
-- It allows notebooks to be updated as learning content without affecting production code.
-- It ensures that documentation can be maintained, versioned, and deployed independently.
+- **`rqm-core` stays dependency-light** and can be tested in isolation without any quantum framework installed.
+- **`rqm-compiler` is backend-neutral** — optimization and normalization passes apply once and benefit all backends.
+- **Backends evolve independently** — changes to Qiskit's API do not affect the Braket backend, and vice versa.
+- **Programs are portable** — the same program description runs on any registered backend.
+- **Documentation is independently deployable** — `rqm-docs` has no runtime dependencies on the packages it documents.
 
-Monorepos trade clarity for convenience. For an ecosystem centered on mathematical correctness and pedagogical value, clear boundaries are worth the additional structure.
+For an ecosystem built around mathematical correctness and backend independence, clear layer boundaries are worth the additional structure.
