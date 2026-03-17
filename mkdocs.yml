@@ -44,10 +44,12 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Ecosystem: ecosystem.md
   - Quickstart: quickstart.md
+  - Ecosystem: ecosystem.md
+  - Concepts: concepts.md
+  - Architecture: architecture.md
   - Install: installation.md
-  - Concepts:
+  - Deep Dives:
       - Quaternion Intuition: concepts/quaternion-intuition.md
       - Spinors and the Bloch Sphere: concepts/spinor-bloch.md
       - SU(2) Geometry: concepts/su2-geometry.md
@@ -56,4 +58,3 @@ nav:
   - API:
       - rqm-core API: api/rqm-core-api.md
       - rqm-qiskit API: api/rqm-qiskit-api.md
-  - Architecture: architecture.md

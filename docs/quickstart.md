@@ -1,106 +1,105 @@
 # Quickstart
 
-Get up and running with the RQM ecosystem in a few minutes.
+> **Write once. Run on any quantum backend.**
+
+Get up and running with the RQM platform in a few minutes.
 
 ---
 
-## 1. Install the Packages
+## 1. Install
 
-Install `rqm-core` (the math engine) and `rqm-qiskit` (the Qiskit execution bridge) from PyPI:
+Install the execution backend you want to use. Each backend pulls in `rqm-core` and `rqm-compiler` automatically.
+
+**AWS Braket backend:**
 
 ```bash
-pip install rqm-core
+pip install rqm-braket
+```
+
+**Qiskit backend:**
+
+```bash
 pip install rqm-qiskit
 ```
 
-Or install both together:
+**Install both:**
 
 ```bash
-pip install rqm-core rqm-qiskit
+pip install rqm-braket rqm-qiskit
 ```
 
 !!! tip "Virtual environment recommended"
-    Use a virtual environment to keep your project dependencies isolated:
     ```bash
     python -m venv .venv
     source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-    pip install rqm-core rqm-qiskit
+    pip install rqm-braket
     ```
 
 ---
 
-## 2. Work with Spinors
+## 2. Run Your First Program
 
-Normalize a qubit spinor and compute its Bloch vector:
+Write a program using RQM's backend-agnostic gate model, then execute it:
+
+```python
+from rqm_braket import BraketBackend, RQMGate
+
+program = [
+    RQMGate("H", target=0),
+    RQMGate("CNOT", control=0, target=1),
+]
+
+backend = BraketBackend()
+result = backend.run_local(program)
+
+print(result.counts)
+```
+
+!!! note "Same program, different backend"
+    The same `program` list can be executed on a Qiskit backend using the same compiler pipeline:
+    ```python
+    from rqm_qiskit import QiskitBackend
+
+    backend = QiskitBackend()
+    result = backend.run_local(program)
+    print(result.counts)
+    ```
+    Swapping backends requires only changing the import and backend constructor. The program and compiler pipeline are identical.
+
+---
+
+## 3. How It Works
+
+When you call `backend.run_local(program)`, the platform executes this pipeline:
+
+```
+program (RQMGate list)
+    → rqm-compiler  (normalize and lower to IR)
+    → rqm-braket    (map IR to Braket circuits)
+    → local simulator
+    → result.counts
+```
+
+`rqm-core` provides the underlying math (quaternions, spinors, SU(2)) that the compiler uses during instruction normalization.
+
+---
+
+## 4. Work Directly with the Math Layer
+
+If you need direct access to the canonical math layer:
 
 ```python
 from rqm_core.spinor import normalize_spinor
 from rqm_core.bloch import state_to_bloch
 
-# Define a raw spinor (does not need to be pre-normalized)
 psi_raw = [1.0, 1.0]
-
-# Normalize to unit magnitude
 psi = normalize_spinor(psi_raw)
-print("Normalized spinor:", psi)
-# → [0.70710678, 0.70710678]
-
-# Convert to a Bloch vector
 bloch = state_to_bloch(psi)
+
+print("Normalized spinor:", psi)
 print("Bloch vector:", bloch)
-# → [1.0, 0.0, 0.0]  (points along +x, the |+⟩ state)
+# Bloch vector: [1.0, 0.0, 0.0]  (|+⟩ state, points along +x)
 ```
-
----
-
-## 3. Convert to SU(2)
-
-Map the spinor through a quaternion to an SU(2) rotation matrix:
-
-```python
-from rqm_core.spinor import spinor_to_quaternion
-from rqm_core.su2 import quaternion_to_su2
-
-q = spinor_to_quaternion(psi)
-print("Quaternion:", q)
-
-U = quaternion_to_su2(q)
-print("SU(2) matrix:\n", U)
-```
-
----
-
-## 4. Prepare a Qiskit Circuit
-
-Use `rqm-qiskit` to prepare a Qiskit state from your spinor and simulate it:
-
-```python
-from rqm_qiskit.state import prepare_state_circuit
-from rqm_qiskit.simulator import run_and_get_bloch
-
-# Build a circuit that prepares |psi⟩
-qc = prepare_state_circuit(psi)
-qc.draw()
-
-# Simulate and recover the Bloch vector
-result = run_and_get_bloch(qc)
-print("Simulated Bloch vector:", result)
-```
-
----
-
-## 5. Learn Interactively with Notebooks
-
-The [`rqm-notebooks`](https://github.com/RQM-Technologies-dev/rqm-notebooks) repository provides a structured series of Jupyter notebooks that walk through every concept and workflow in depth.
-
-```bash
-git clone https://github.com/RQM-Technologies-dev/rqm-notebooks.git
-cd rqm-notebooks
-pip install -r requirements.txt
-jupyter lab
-```
-
-Open the notebooks in numbered order. See the [Notebooks guide](notebooks.md) for the full learning path.
 
 ---
 
@@ -108,8 +107,8 @@ Open the notebooks in numbered order. See the [Notebooks guide](notebooks.md) fo
 
 | Goal | Where to go |
 |---|---|
+| Understand how the layers connect | [Concepts](concepts.md) |
+| Full ecosystem overview | [Ecosystem](ecosystem.md) |
 | Full install options (editable, from GitHub) | [Installation](installation.md) |
-| Understand how the repos relate | [Ecosystem](ecosystem.md) |
-| Build quaternion / spinor intuition | [Concepts](concepts/quaternion-intuition.md) |
-| API function reference | [rqm-core API](api/rqm-core-api.md) |
+| Math API reference | [rqm-core API](api/rqm-core-api.md) |
 | Qiskit execution reference | [rqm-qiskit API](api/rqm-qiskit-api.md) |
