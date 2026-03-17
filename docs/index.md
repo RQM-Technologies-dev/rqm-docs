@@ -1,5 +1,7 @@
 # RQM Documentation
 
+**Status:** Active development · Production-ready architecture
+
 > **Write once. Run on any quantum backend.**
 
 RQM is a compiler-first quantum software platform that separates mathematical representation, compilation, and execution across multiple quantum backends.
@@ -12,12 +14,7 @@ It provides a backend-agnostic workflow where the same program can be compiled a
 
 RQM is structured as a layered pipeline from canonical math to backend execution:
 
-```
-rqm-core      → canonical math (quaternions, spinors, SU(2))
-rqm-compiler  → instruction generation and normalization
-rqm-qiskit    → Qiskit execution backend
-rqm-braket    → AWS Braket execution backend
-```
+![RQM architecture: rqm-core feeds into rqm-compiler, which feeds into rqm-qiskit and rqm-braket](assets/images/architecture-diagram.svg)
 
 | Layer | Repository | Responsibility |
 |---|---|---|
@@ -55,3 +52,7 @@ This separation means the same program can run on Qiskit or Amazon Braket withou
 
 !!! tip "New to the platform?"
     Start with [Quickstart](quickstart.md) for a working example, then read [Concepts](concepts.md) to understand the architecture.
+
+---
+
+🌐 **Website:** [https://rqmtechnologies.com](https://rqmtechnologies.com)

@@ -4,6 +4,20 @@ This page explains the key design ideas behind the RQM platform: why it is built
 
 ---
 
+## Mental Model
+
+Think of RQM as three distinct responsibilities:
+
+- **`rqm-core`** → defines the physics (quaternions, spinors, SU(2))
+- **`rqm-compiler`** → defines how programs are constructed
+- **backends** → define where programs run
+
+You write programs once at the compiler layer, and choose execution at the backend layer. The physics layer never changes regardless of which backend you use.
+
+This separation is why the same program runs on Qiskit and Braket without modification.
+
+---
+
 ## Compiler-First Design
 
 Most quantum frameworks couple the program representation tightly to a single execution backend. RQM takes a different approach: the program is compiled first, then executed.

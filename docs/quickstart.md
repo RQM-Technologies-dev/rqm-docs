@@ -16,11 +16,15 @@ Install the execution backend you want to use. Each backend pulls in `rqm-core` 
 pip install rqm-braket
 ```
 
+`rqm-braket` installs the full runtime stack — `rqm-core`, `rqm-compiler`, and the Braket execution layer — so this single command is all you need to start running programs.
+
 **Qiskit backend:**
 
 ```bash
 pip install rqm-qiskit
 ```
+
+`rqm-qiskit` installs the full runtime stack — `rqm-core`, `rqm-compiler`, and the Qiskit execution layer — so this single command is all you need to start running programs on Qiskit.
 
 **Install both:**
 

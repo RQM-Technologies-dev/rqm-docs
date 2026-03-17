@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 290" width="400" height="290" role="img" aria-label="RQM architecture diagram showing rqm-core feeding into rqm-compiler which feeds into rqm-qiskit and rqm-braket">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#4f46e5"/>
+    </marker>
+  </defs>
+
+  <!-- rqm-core -->
+  <rect x="130" y="20" width="140" height="44" rx="6" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="200" y="47" text-anchor="middle" font-family="ui-monospace,monospace" font-size="14" fill="#1e1b4b" font-weight="600">rqm-core</text>
+
+  <!-- arrow: rqm-core → rqm-compiler -->
+  <line x1="200" y1="64" x2="200" y2="109" stroke="#4f46e5" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- rqm-compiler -->
+  <rect x="120" y="113" width="160" height="44" rx="6" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="200" y="140" text-anchor="middle" font-family="ui-monospace,monospace" font-size="14" fill="#1e1b4b" font-weight="600">rqm-compiler</text>
+
+  <!-- fork: rqm-compiler → rqm-qiskit -->
+  <path d="M200,157 L200,180 L110,180 L110,201" fill="none" stroke="#4f46e5" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- fork: rqm-compiler → rqm-braket -->
+  <path d="M200,157 L200,180 L290,180 L290,201" fill="none" stroke="#4f46e5" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- rqm-qiskit -->
+  <rect x="40" y="205" width="140" height="44" rx="6" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="110" y="232" text-anchor="middle" font-family="ui-monospace,monospace" font-size="13" fill="#1e1b4b" font-weight="600">rqm-qiskit</text>
+
+  <!-- rqm-braket -->
+  <rect x="220" y="205" width="140" height="44" rx="6" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="290" y="232" text-anchor="middle" font-family="ui-monospace,monospace" font-size="13" fill="#1e1b4b" font-weight="600">rqm-braket</text>
+
+  <!-- layer labels -->
+  <text x="280" y="47" text-anchor="start" font-family="ui-sans-serif,sans-serif" font-size="11" fill="#6366f1">canonical math</text>
+  <text x="286" y="140" text-anchor="start" font-family="ui-sans-serif,sans-serif" font-size="11" fill="#6366f1">compiler</text>
+  <text x="110" y="268" text-anchor="middle" font-family="ui-sans-serif,sans-serif" font-size="11" fill="#6366f1">Qiskit backend</text>
+  <text x="290" y="268" text-anchor="middle" font-family="ui-sans-serif,sans-serif" font-size="11" fill="#6366f1">Braket backend</text>
+</svg>
