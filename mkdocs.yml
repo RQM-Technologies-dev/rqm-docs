@@ -43,18 +43,23 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - Home: index.md
-  - Quickstart: quickstart.md
-  - Ecosystem: ecosystem.md
-  - Concepts: concepts.md
-  - Architecture: architecture.md
-  - Install: installation.md
-  - Deep Dives:
-      - Quaternion Intuition: concepts/quaternion-intuition.md
-      - Spinors and the Bloch Sphere: concepts/spinor-bloch.md
-      - SU(2) Geometry: concepts/su2-geometry.md
-      - Global Phase: concepts/global-phase.md
-  - Notebooks: notebooks.md
-  - API:
-      - rqm-core API: api/rqm-core-api.md
-      - rqm-qiskit API: api/rqm-qiskit-api.md
+  - Precision Timing Systems:
+      - Overview: precision-timing/index.md
+  - Quantum Computing:
+      - Home: index.md
+      - Quickstart: quickstart.md
+      - Ecosystem: ecosystem.md
+      - Concepts: concepts.md
+      - Architecture: architecture.md
+      - Install: installation.md
+      - Deep Dives:
+          - Quaternion Intuition: concepts/quaternion-intuition.md
+          - Spinors and the Bloch Sphere: concepts/spinor-bloch.md
+          - SU(2) Geometry: concepts/su2-geometry.md
+          - Global Phase: concepts/global-phase.md
+      - Notebooks: notebooks.md
+      - API:
+          - rqm-core API: api/rqm-core-api.md
+          - rqm-qiskit API: api/rqm-qiskit-api.md
+  - Quantum Communication:
+      - Overview: quantum-communication/index.md
