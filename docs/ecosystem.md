@@ -38,6 +38,16 @@ RQM is a compiler-first quantum software platform built from focused, composable
 - **Exposes `BraketBackend`** with `run_local()` and `run_device()` methods
 - **Returns normalized results** compatible with the RQM result contract
 
+### `rqm-optimize` — Optimization Layer
+
+`rqm-optimize` applies SU(2)-aware circuit optimization and compression to compiled circuits before they are submitted to a backend. It uses quaternion composition from `rqm-core` to fuse, simplify, and reduce gate sequences with geometric correctness.
+
+- **Depends on `rqm-core`** for SU(2) and quaternion primitives
+- **Backend-compatible** — accepts circuits already translated to a backend format (Qiskit or Braket)
+- **Drop-in step** — insert `optimize(qc)` between translation and execution without restructuring the pipeline
+
+See the [Optimization guide](optimization.md) for details and usage examples.
+
 ### `rqm-notebooks` — Demos and Learning
 
 `rqm-notebooks` is a curated collection of Jupyter notebooks that guide users from first principles through practical quantum circuit execution.
@@ -51,10 +61,11 @@ RQM is a compiler-first quantum software platform built from focused, composable
 ## Architecture Diagram
 
 ```
-rqm-core      → canonical math (quaternions, spinors, SU(2))
-rqm-compiler  → instruction generation and normalization
-rqm-qiskit    → Qiskit execution backend
-rqm-braket    → AWS Braket execution backend
+rqm-core       → canonical math (quaternions, spinors, SU(2))
+rqm-compiler   → instruction generation and normalization
+rqm-qiskit     → execution bridge (Qiskit)
+rqm-braket     → execution bridge (AWS Braket)
+rqm-optimize   → optimization layer (SU(2)-aware gate fusion and compression)
 ```
 
 ```
@@ -68,14 +79,21 @@ rqm-braket    → AWS Braket execution backend
   ┌─────────────┐ ┌──────────────┐ ┌───────────────┐
   │  rqm-core   │ │ rqm-compiler │ │ rqm-notebooks │
   │ (math/core) │◄│  (compiler)  │ │  (learning)   │
-  └─────────────┘ └──────┬───────┘ └───────────────┘
-                         │
-             ┌───────────┴───────────┐
-             ▼                       ▼
-      ┌─────────────┐        ┌──────────────┐
-      │ rqm-qiskit  │        │  rqm-braket  │
-      │  (Qiskit)   │        │   (Braket)   │
-      └─────────────┘        └──────────────┘
+  └──────┬──────┘ └──────┬───────┘ └───────────────┘
+         │               │
+         │   ┌───────────┴───────────┐
+         │   ▼                       ▼
+         │ ┌─────────────┐        ┌──────────────┐
+         │ │ rqm-qiskit  │        │  rqm-braket  │
+         │ │  (Qiskit)   │        │   (Braket)   │
+         │ └──────┬──────┘        └──────┬───────┘
+         │        │                      │
+         │        └──────────┬───────────┘
+         │                   ▼
+         │        ┌─────────────────────┐
+         └───────►│   rqm-optimize      │
+                  │ (optimization layer)│
+                  └─────────────────────┘
 ```
 
 ---
@@ -88,6 +106,7 @@ rqm-braket    → AWS Braket execution backend
 | Understand the compiler | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) + [Architecture](architecture.md) |
 | Run on Qiskit | [`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) + [API guide](api/rqm-qiskit-api.md) |
 | Run on Braket | [`rqm-braket`](https://github.com/RQM-Technologies-dev/rqm-braket) |
+| Optimize circuits | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) + [Optimization guide](optimization.md) |
 | Learn interactively | [`rqm-notebooks`](https://github.com/RQM-Technologies-dev/rqm-notebooks) + [Notebooks guide](notebooks.md) |
 | Read architecture rationale | [Architecture page](architecture.md) |
 | Install packages | [Installation guide](installation.md) |

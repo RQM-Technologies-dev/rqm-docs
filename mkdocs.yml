@@ -49,6 +49,7 @@ nav:
       - Home: index.md
       - Quickstart: quickstart.md
       - Ecosystem: ecosystem.md
+      - Optimization: optimization.md
       - Concepts: concepts.md
       - Architecture: architecture.md
       - Install: installation.md
