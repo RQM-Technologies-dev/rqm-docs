@@ -24,7 +24,11 @@ pip install rqm-core
 pip install rqm-qiskit
 ```
 
-Install both at once:
+```bash
+pip install rqm-pennylane
+```
+
+Install rqm-core and rqm-qiskit together:
 
 ```bash
 pip install rqm-core rqm-qiskit
@@ -55,6 +59,18 @@ pip install -e .
 ```bash
 git clone https://github.com/RQM-Technologies-dev/rqm-qiskit.git
 cd rqm-qiskit
+pip install -e .
+```
+
+```bash
+pip install git+https://github.com/RQM-Technologies-dev/rqm-pennylane.git
+```
+
+To install an editable local clone:
+
+```bash
+git clone https://github.com/RQM-Technologies-dev/rqm-pennylane.git
+cd rqm-pennylane
 pip install -e .
 ```
 
@@ -106,3 +122,5 @@ print("RQM ecosystem ready.")
 
 !!! note "Dependencies"
     `rqm-qiskit` depends on `rqm-core` and will install it automatically if it is not already present. You do not need to install both separately unless you want only the math layer.
+
+    `rqm-pennylane` depends on `rqm-compiler` (and transitively `rqm-core`) and requires [PennyLane](https://pennylane.ai/) (`pip install pennylane`).

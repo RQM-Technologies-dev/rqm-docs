@@ -11,7 +11,11 @@ This site is built with [MkDocs](https://www.mkdocs.org/) and the [Material them
 | Repository | Role |
 |---|---|
 | [`rqm-core`](https://github.com/RQM-Technologies-dev/rqm-core) | Canonical math engine: quaternions, spinors, Bloch vectors, SU(2) |
-| [`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) | Execution bridge: Qiskit circuits, gates, and simulators |
+| [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) | Canonical circuit model: instruction generation and IR lowering |
+| [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) | Circuit simplification and rewriting: SU(2)-aware gate fusion |
+| [`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) | Qiskit execution layer |
+| [`rqm-braket`](https://github.com/RQM-Technologies-dev/rqm-braket) | Braket execution layer |
+| [`rqm-pennylane`](https://github.com/RQM-Technologies-dev/rqm-pennylane) | Differentiable and variational workflow layer (PennyLane) |
 | [`rqm-notebooks`](https://github.com/RQM-Technologies-dev/rqm-notebooks) | Guided learning: Jupyter notebooks and demos |
 | [`rqm-docs`](https://github.com/RQM-Technologies-dev/rqm-docs) | This documentation site |
 

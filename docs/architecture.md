@@ -30,7 +30,13 @@ Neither backend reimplements math or compilation logic. They each implement the 
 
 Optimization is a post-compilation, pre-execution step. It is optional for simulation but recommended for hardware runs where gate count directly affects decoherence.
 
-### 5. Documentation lives in `rqm-docs`
+### 5. Differentiable workflows live in `rqm-pennylane`
+
+`rqm-pennylane` exposes the RQM compiler and execution pipeline through [PennyLane](https://pennylane.ai/)'s device interface. It enables gradient-based optimization, quantum machine learning, and variational circuit workflows — such as VQE and QAOA — without leaving the RQM stack.
+
+Variational workflows depend on the compiler and execution layers but do not modify them. `rqm-pennylane` is an additive layer: it does not change how compilation or execution work, it extends the platform to support differentiable programming.
+
+### 6. Documentation lives in `rqm-docs`
 
 `rqm-docs` (this site) organizes and explains the platform. It does not introduce new algorithms, theory, or notebook content. Its job is to make everything else discoverable, understandable, and usable.
 
@@ -72,16 +78,18 @@ The program is defined once. The compiler processes it once. Execution backends 
 ## Dependency Graph
 
 ```
-rqm-braket    ──► rqm-compiler ──► rqm-core
-rqm-qiskit    ──► rqm-compiler ──► rqm-core
-rqm-optimize  ──► rqm-core
-rqm-notebooks ──► rqm-qiskit, rqm-braket
+rqm-braket      ──► rqm-compiler ──► rqm-core
+rqm-qiskit      ──► rqm-compiler ──► rqm-core
+rqm-pennylane   ──► rqm-compiler ──► rqm-core
+rqm-optimize    ──► rqm-core
+rqm-notebooks   ──► rqm-qiskit, rqm-braket
 ```
 
 - `rqm-core` has no ecosystem dependencies.
 - `rqm-compiler` depends on `rqm-core`.
 - `rqm-qiskit` depends on `rqm-compiler` (and transitively `rqm-core`).
 - `rqm-braket` depends on `rqm-compiler` (and transitively `rqm-core`).
+- `rqm-pennylane` depends on `rqm-compiler` (and transitively `rqm-core`). It provides a PennyLane device that wraps the RQM compilation and execution pipeline for differentiable and variational workflows.
 - `rqm-optimize` depends on `rqm-core` for SU(2) and quaternion primitives. It is applied at runtime to circuits already translated to a backend format — it is not a package-level dependency of `rqm-qiskit` or `rqm-braket`.
 - `rqm-notebooks` depends on the execution backends.
 - `rqm-docs` references all packages but has no runtime dependency on any of them.
@@ -97,6 +105,7 @@ rqm-notebooks ──► rqm-qiskit, rqm-braket
 | Execution | `rqm-qiskit` | Maps IR to Qiskit circuits and simulators |
 | Execution | `rqm-braket` | Maps IR to Braket circuits and simulators |
 | Optimization | `rqm-optimize` | SU(2)-aware gate fusion and circuit compression |
+| Variational | `rqm-pennylane` | Differentiable and variational workflows via PennyLane |
 | Learning | `rqm-notebooks` | Teaches and demonstrates the platform through notebooks |
 | Documentation | `rqm-docs` | Explains, organizes, and guides users |
 
@@ -114,6 +123,8 @@ rqm-notebooks ──► rqm-qiskit, rqm-braket
 | Braket circuit from IR | `rqm-braket` |
 | Circuit execution helpers | `rqm-qiskit` / `rqm-braket` |
 | SU(2)-aware gate fusion and compression | `rqm-optimize` |
+| Variational algorithms and QML | `rqm-pennylane` |
+| PennyLane QNode / gradient interface | `rqm-pennylane` |
 | Tutorial notebook | `rqm-notebooks` |
 | Concept explanation | `rqm-docs` |
 | API reference guide | `rqm-docs` |
@@ -128,6 +139,7 @@ Separating math, compilation, and execution into distinct layers provides concre
 - **`rqm-compiler` is backend-neutral** — optimization and normalization passes apply once and benefit all backends.
 - **Backends evolve independently** — changes to Qiskit's API do not affect the Braket backend, and vice versa.
 - **`rqm-optimize` is geometry-correct** — gate fusion uses exact SU(2) arithmetic from `rqm-core`, not floating-point heuristics.
+- **`rqm-pennylane` is additive** — it adds differentiable and variational workflows on top of the existing stack without changing compilation or execution.
 - **Programs are portable** — the same program description runs on any registered backend.
 - **Documentation is independently deployable** — `rqm-docs` has no runtime dependencies on the packages it documents.
 

@@ -48,6 +48,15 @@ RQM is a compiler-first quantum software platform built from focused, composable
 
 See the [Optimization guide](optimization.md) for details and usage examples.
 
+### `rqm-pennylane` — Differentiable and Variational Workflow Layer
+
+`rqm-pennylane` integrates the RQM stack with [PennyLane](https://pennylane.ai/) to support differentiable quantum computing and variational algorithms. It exposes the RQM compiler and execution pipeline through PennyLane's device interface, enabling gradient-based optimization, quantum machine learning, and variational circuit workflows.
+
+- **Depends on `rqm-compiler`** for the normalized IR
+- **PennyLane-compatible device** — plug-in replacement for other PennyLane devices
+- **Supports `grad`, `qnode`, and variational optimizers** through PennyLane's standard interface
+- **Bridges RQM's geometry-correct math** with PennyLane's automatic differentiation engine
+
 ### `rqm-notebooks` — Demos and Learning
 
 `rqm-notebooks` is a curated collection of Jupyter notebooks that guide users from first principles through practical quantum circuit execution.
@@ -66,6 +75,7 @@ rqm-compiler   → instruction generation and normalization
 rqm-qiskit     → execution bridge (Qiskit)
 rqm-braket     → execution bridge (AWS Braket)
 rqm-optimize   → optimization layer (SU(2)-aware gate fusion and compression)
+rqm-pennylane  → differentiable and variational workflow layer (PennyLane)
 ```
 
 ```
@@ -81,20 +91,22 @@ rqm-optimize   → optimization layer (SU(2)-aware gate fusion and compression)
   │ (math/core) │◄│  (compiler)  │ │  (learning)   │
   └──────┬──────┘ └──────┬───────┘ └───────────────┘
          │               │
-         │   ┌───────────┴───────────┐
-         │   ▼                       ▼
-         │ ┌─────────────┐        ┌──────────────┐
-         │ │ rqm-qiskit  │        │  rqm-braket  │
-         │ │  (Qiskit)   │        │   (Braket)   │
-         │ └──────┬──────┘        └──────┬───────┘
-         │        │                      │
+         │   ┌───────────┴───────────┬──────────────────────┐
+         │   ▼                       ▼                      ▼
+         │ ┌─────────────┐        ┌──────────────┐  ┌──────────────────┐
+         │ │ rqm-qiskit  │        │  rqm-braket  │  │  rqm-pennylane   │
+         │ │  (Qiskit)   │        │   (Braket)   │  │  (variational /  │
+         │ └──────┬──────┘        └──────┬───────┘  │  differentiable) │
+         │        │                      │           └──────────────────┘
          │        └──────────┬───────────┘
          │                   ▼
          │        ┌─────────────────────┐
          └───────►│   rqm-optimize      │
-                  │ (optimization layer)│
+                  │ (SU(2) gate fusion) │
                   └─────────────────────┘
 ```
+
+> **Note:** `rqm-pennylane` depends on `rqm-compiler` in the same way as the execution backends, but serves a distinct purpose: it provides a PennyLane device interface for variational and differentiable workflows (gradient-based optimization, QML). It does not pass through `rqm-optimize`, which operates on circuits already in a backend format.
 
 ---
 
@@ -106,6 +118,7 @@ rqm-optimize   → optimization layer (SU(2)-aware gate fusion and compression)
 | Understand the compiler | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) + [Architecture](architecture.md) |
 | Run on Qiskit | [`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) + [API guide](api/rqm-qiskit-api.md) |
 | Run on Braket | [`rqm-braket`](https://github.com/RQM-Technologies-dev/rqm-braket) |
+| Differentiable / variational workflows | [`rqm-pennylane`](https://github.com/RQM-Technologies-dev/rqm-pennylane) + [API guide](api/rqm-pennylane-api.md) |
 | Optimize circuits | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) + [Optimization guide](optimization.md) |
 | Learn interactively | [`rqm-notebooks`](https://github.com/RQM-Technologies-dev/rqm-notebooks) + [Notebooks guide](notebooks.md) |
 | Read architecture rationale | [Architecture page](architecture.md) |
