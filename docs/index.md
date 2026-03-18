@@ -52,6 +52,9 @@ This separation means the same program can run on Qiskit or Amazon Braket withou
 
 ---
 
+!!! note "🔷 Quaternionic Signal Processing (QSP)"
+    RQM now includes **Quaternionic Signal Processing (QSP)** — a framework for applying quaternion-based mathematics to signal processing tasks. See the [QSP Overview](qsp/index.md) for the full stack documentation.
+
 !!! tip "New: rqm-optimize"
     **rqm-optimize** is now part of the RQM ecosystem — an SU(2)-aware circuit optimization and compression layer. Insert `optimize(qc)` between translation and execution to reduce gate count before hardware runs. See the [Optimization guide](optimization.md).
 
