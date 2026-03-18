@@ -54,6 +54,9 @@ This separation means the same program can run on Qiskit or Amazon Braket withou
 
 ---
 
+!!! note "🔷 Quaternionic Signal Processing (QSP)"
+    RQM now includes **Quaternionic Signal Processing (QSP)** — a framework for applying quaternion-based mathematics to signal processing tasks. See the [QSP Overview](qsp/index.md) for the full stack documentation.
+
 !!! tip "New: rqm-pennylane"
     **rqm-pennylane** is now part of the RQM ecosystem — a differentiable and variational workflow layer built on [PennyLane](https://pennylane.ai/). Use it to run variational algorithms, quantum machine learning models, and gradient-based optimization through the RQM stack. See the [Ecosystem overview](ecosystem.md).
 

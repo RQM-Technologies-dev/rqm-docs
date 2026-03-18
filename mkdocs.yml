@@ -63,5 +63,7 @@ nav:
           - rqm-core API: api/rqm-core-api.md
           - rqm-qiskit API: api/rqm-qiskit-api.md
           - rqm-pennylane API: api/rqm-pennylane-api.md
+  - Quaternionic Signal Processing:
+      - Overview: qsp/index.md
   - Quantum Communication:
       - Overview: quantum-communication/index.md
