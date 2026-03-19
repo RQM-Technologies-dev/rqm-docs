@@ -55,6 +55,9 @@ This separation means the same program can run on Qiskit or Amazon Braket withou
 !!! note "🔷 Quaternionic Signal Processing (QSP)"
     RQM now includes **Quaternionic Signal Processing (QSP)** — a framework for applying quaternion-based mathematics to signal processing tasks. See the [QSP Overview](qsp/index.md) for the full stack documentation.
 
+!!! tip "New: Canonical IR (`u1q`) and `to_u1q_pass`"
+    The RQM compiler now uses **`u1q`** as its canonical single-qubit gate — a complete SU(2) element encoded as a unit quaternion. The `to_u1q_pass` converts all named single-qubit gates (`rx`, `ry`, `rz`, `h`, `s`, `t`, …) to this form, producing a minimal, geometry-grounded IR. See the [Canonical IR guide](compiler/canonical-ir.md).
+
 !!! tip "New: rqm-optimize"
     **rqm-optimize** is now part of the RQM ecosystem — an SU(2)-aware circuit optimization and compression layer. Insert `optimize(qc)` between translation and execution to reduce gate count before hardware runs. See the [Optimization guide](optimization.md).
 
