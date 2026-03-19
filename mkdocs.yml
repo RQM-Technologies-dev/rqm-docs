@@ -43,8 +43,6 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - Precision Timing Systems:
-      - Overview: precision-timing/index.md
   - Quantum Computing:
       - Home: index.md
       - Quickstart: quickstart.md
@@ -52,6 +50,7 @@ nav:
       - Optimization: optimization.md
       - Concepts: concepts.md
       - Architecture: architecture.md
+      - Canonical IR (u1q): compiler/canonical-ir.md
       - Install: installation.md
       - Deep Dives:
           - Quaternion Intuition: concepts/quaternion-intuition.md
@@ -65,5 +64,3 @@ nav:
           - rqm-qiskit API: api/rqm-qiskit-api.md
   - Quaternionic Signal Processing:
       - Overview: qsp/index.md
-  - Quantum Communication:
-      - Overview: quantum-communication/index.md

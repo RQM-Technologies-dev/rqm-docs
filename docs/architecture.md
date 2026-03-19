@@ -18,6 +18,8 @@ If you need to compute a spinor normalization, convert to a Bloch vector, or con
 
 The compiler resolves logical gate names to explicit unitary matrices using `rqm-core` primitives. It applies normalization passes to ensure the IR is backend-ready. Backends do not perform gate resolution — that work is done once at the compiler level.
 
+The canonical single-qubit gate in the compiler IR is **`u1q`** — a complete SU(2) element encoded as a unit quaternion `(w, x, y, z)`. The `to_u1q_pass` converts all named single-qubit gates (`rx`, `ry`, `rz`, `h`, `s`, `t`, …) to `u1q` using exact quaternion mappings. See [Canonical IR (u1q)](compiler/canonical-ir.md) for the full design and gate mapping table.
+
 ### 3. Execution lives in the backend packages
 
 `rqm-qiskit` and `rqm-braket` are execution backends. They translate the compiler IR into their respective native circuit formats and run them on simulators or hardware.
@@ -45,7 +47,7 @@ RQMGate list
     │
     ▼
 rqm-compiler
-  (normalize gates, resolve matrices, produce IR)
+  (gate resolution, to_u1q_pass → canonical IR)
     │
     ├──────────────────┐
     ▼                  ▼
@@ -55,7 +57,7 @@ rqm-qiskit        rqm-braket
     └────────┬─────────┘
              ▼
         rqm-optimize
-  (SU(2) fusion, compression)
+  (quaternion fusion, compression)
              │
     ┌────────┴─────────┐
     ▼                  ▼
@@ -110,6 +112,7 @@ rqm-notebooks ──► rqm-qiskit, rqm-braket
 | Bloch vector conversion | `rqm-core` |
 | SU(2) matrix construction | `rqm-core` |
 | Gate normalization and IR lowering | `rqm-compiler` |
+| Canonical single-qubit IR (`u1q`) and `to_u1q_pass` | `rqm-compiler` |
 | Qiskit circuit from IR | `rqm-qiskit` |
 | Braket circuit from IR | `rqm-braket` |
 | Circuit execution helpers | `rqm-qiskit` / `rqm-braket` |

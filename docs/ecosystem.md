@@ -20,6 +20,7 @@ RQM is a compiler-first quantum software platform built from focused, composable
 
 - **Depends on `rqm-core`** for gate matrix resolution
 - **Backend-independent** — the compiler output is the same regardless of which backend will run the program
+- **Canonical single-qubit IR** — `to_u1q_pass` converts all single-qubit gates to `u1q`, a complete SU(2) element encoded as a unit quaternion; see [Canonical IR (u1q)](compiler/canonical-ir.md)
 - **Enables optimization passes** that apply once across all backends
 
 ### `rqm-qiskit` — Qiskit Execution Backend
