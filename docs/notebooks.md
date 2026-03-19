@@ -32,6 +32,9 @@ These notebooks introduce the core mathematical objects: quaternions, spinors, a
 
 **Goal**: Understand the objects that `rqm-core` operates on.
 
+!!! tip "Theory reference"
+    Notebook `00_quaternion_basics` demonstrates that quaternion multiplication composes rotations. For the exact mathematical basis — including why this is equivalent to gate composition on S³ — see [Complete Quaternion Theory, Section 10: Why quaternion multiplication models gate composition](concepts/quaternion-theory.md#10-why-quaternion-multiplication-models-gate-composition).
+
 ---
 
 ### Step 2: Core Library Workflows (Notebooks 03–05)

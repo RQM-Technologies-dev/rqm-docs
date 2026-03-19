@@ -1,5 +1,12 @@
 # Complete Theory: Quaternion Form for Quantum States and Quantum Gates
 
+!!! abstract "Reference document"
+    This document defines the mathematical foundation of Quaternionic Signal Processing (QSP) and the RQM quantum computing stack.
+
+    It establishes the equivalence between SU(2), unit quaternions, and rotations on S³, and provides the exact correspondence between quaternion representations and quantum gate operations.
+
+    This page serves as the reference layer for both QSP and RQM computational frameworks.
+
 This page gives a thorough mathematical treatment of why unit quaternions are the natural representation for single-qubit gates and states in the RQM ecosystem.
 
 ---
