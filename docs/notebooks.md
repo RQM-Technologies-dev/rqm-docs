@@ -2,13 +2,16 @@
 
 [`rqm-notebooks`](https://github.com/RQM-Technologies-dev/rqm-notebooks) is the primary learning interface for the RQM ecosystem. It provides a structured sequence of Jupyter notebooks that guide users from first principles through practical quantum circuit execution.
 
+!!! note "Notebooks are conceptual"
+    The notebooks illustrate mathematical ideas and platform workflows. They are not production deployment patterns. For running circuits in a production context, use `rqm-api` and `rqm-circuits` as described in the [Quickstart](quickstart.md).
+
 ---
 
 ## Role of `rqm-notebooks`
 
 The notebooks serve three purposes:
 
-1. **Demonstration** — show how `rqm-core` and `rqm-qiskit` work together in realistic scenarios.
+1. **Demonstration** — show how `rqm-core`, `rqm-circuits`, and the execution backends work together in realistic scenarios.
 2. **Explanation** — provide prose, equations, and visualizations that connect the math to the code.
 3. **Exploration** — offer runnable examples that users can modify and extend.
 
@@ -53,24 +56,24 @@ These notebooks demonstrate the `rqm-core` API directly — normalization, conve
 
 ### Step 3: Ecosystem Architecture (Notebook 10)
 
-This notebook provides a high-level tour of the full ecosystem stack — how the repos relate to each other and how data flows from `rqm-core` through `rqm-qiskit` to a circuit result.
+This notebook provides a high-level tour of the full ecosystem stack — how the repos relate to each other and how data flows from `rqm-circuits` through `rqm-compiler` to a circuit result.
 
 | Notebook | Topic |
 |---|---|
-| `10_ecosystem_architecture.ipynb` | Full stack walkthrough: core → qiskit → circuit |
+| `10_ecosystem_architecture.ipynb` | Full stack walkthrough: circuits → compiler → backend → result |
 
 **Goal**: Understand the architecture in code, not just diagrams.
 
 ---
 
-### Step 4: Qiskit Execution Workflows
+### Step 4: Execution Workflows
 
-These notebooks use `rqm-qiskit` to prepare states, construct circuits, and run simulations.
+These notebooks use `rqm-circuits` and `rqm-api` to construct and run circuits on execution backends.
 
 | Notebook | Topic |
 |---|---|
-| `20_state_preparation.ipynb` | Preparing Qiskit states from RQM spinors |
-| `21_gate_construction.ipynb` | Building custom gates from SU(2) matrices |
+| `20_state_preparation.ipynb` | Preparing quantum states from RQM spinors |
+| `21_gate_construction.ipynb` | Building circuits from SU(2) matrices |
 | `22_simulation_and_results.ipynb` | Running circuits and interpreting results |
 
 **Goal**: Execute real quantum circuits using RQM geometry objects.
@@ -93,4 +96,4 @@ Open notebooks in the numbered order for the best learning experience.
 ---
 
 !!! tip "Prerequisites"
-    Steps 1 and 2 require only `rqm-core`. Steps 3 and 4 require both `rqm-core` and `rqm-qiskit`. See the [installation guide](installation.md) for setup instructions.
+    Steps 1 and 2 require only `rqm-core`. Steps 3 and 4 require `rqm-circuits`, `rqm-api`, and an execution backend. See the [installation guide](installation.md) for setup instructions.

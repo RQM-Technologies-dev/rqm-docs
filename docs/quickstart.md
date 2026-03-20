@@ -8,87 +8,88 @@ Get up and running with the RQM platform in a few minutes.
 
 ## 1. Install
 
-Install the execution backend you want to use. Each backend pulls in `rqm-core` and `rqm-compiler` automatically.
-
-**AWS Braket backend:**
+Install the top-level API and the circuit construction layer, plus the execution backend of your choice:
 
 ```bash
-pip install rqm-braket
+pip install rqm-api rqm-circuits rqm-qiskit
 ```
 
-`rqm-braket` installs the full runtime stack — `rqm-core`, `rqm-compiler`, and the Braket execution layer — so this single command is all you need to start running programs.
-
-**Qiskit backend:**
+To use the AWS Braket backend instead:
 
 ```bash
-pip install rqm-qiskit
+pip install rqm-api rqm-circuits rqm-braket
 ```
 
-`rqm-qiskit` installs the full runtime stack — `rqm-core`, `rqm-compiler`, and the Qiskit execution layer — so this single command is all you need to start running programs on Qiskit.
-
-**Install both:**
+To use PennyLane:
 
 ```bash
-pip install rqm-braket rqm-qiskit
+pip install rqm-api rqm-circuits rqm-pennylane
 ```
+
+Each backend package pulls in `rqm-core` and `rqm-compiler` automatically.
 
 !!! tip "Virtual environment recommended"
     ```bash
     python -m venv .venv
     source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-    pip install rqm-braket
+    pip install rqm-api rqm-circuits rqm-qiskit
     ```
 
 ---
 
-## 2. Run Your First Program
+## 2. Create a Circuit
 
-Write a program using RQM's backend-agnostic gate model, then execute it:
+Build a circuit using `rqm-circuits`:
 
 ```python
-from rqm_braket import BraketBackend, RQMGate
+from rqm_circuits import Circuit, Gate
 
-program = [
-    RQMGate("H", target=0),
-    RQMGate("CNOT", control=0, target=1),
-]
-
-backend = BraketBackend()
-result = backend.run_local(program)
-
-print(result.counts)
+qc = Circuit(num_qubits=2)
+qc.add(Gate("H", target=0))
+qc.add(Gate("CNOT", control=0, target=1))
 ```
-
-!!! note "Same program, different backend"
-    The same `program` list can be executed on a Qiskit backend using the same compiler pipeline:
-    ```python
-    from rqm_qiskit import QiskitBackend
-
-    backend = QiskitBackend()
-    result = backend.run_local(program)
-    print(result.counts)
-    ```
-    Swapping backends requires only changing the import and backend constructor. The program and compiler pipeline are identical.
 
 ---
 
-## 3. How It Works
+## 3. Run the Circuit
 
-When you call `backend.run_local(program)`, the platform executes this pipeline:
+Submit the circuit via `rqm-api` and choose your backend:
+
+```python
+from rqm_api import run
+
+result = run(qc, backend="qiskit")
+print(result.counts)
+# {"00": 512, "11": 512}
+```
+
+!!! note "Same circuit, different backend"
+    Swapping backends requires only changing the `backend` argument:
+    ```python
+    result = run(qc, backend="braket")
+    print(result.counts)
+    ```
+    The circuit and compilation pipeline are identical — only the execution target changes.
+
+---
+
+## 4. How It Works
+
+When you call `run(qc, backend="qiskit")`, the platform executes this pipeline:
 
 ```
-program (RQMGate list)
-    → rqm-compiler  (normalize and lower to IR)
-    → rqm-braket    (map IR to Braket circuits)
+rqm-circuits (circuit object)
+    → rqm-compiler  (normalize gates → u1q IR)
+    → rqm-qiskit    (map IR to Qiskit circuit)
     → local simulator
     → result.counts
 ```
 
-`rqm-core` provides the underlying math (quaternions, spinors, SU(2)) that the compiler uses during instruction normalization.
+`rqm-core` provides the underlying math (quaternions, spinors, SU(2)) that the compiler uses during gate normalization. The canonical IR (`u1q`) is the single-qubit representation passed to all backends.
 
 ---
 
-## 4. Work Directly with the Math Layer
+## 5. Work Directly with the Math Layer
 
 If you need direct access to the canonical math layer:
 
@@ -111,8 +112,10 @@ print("Bloch vector:", bloch)
 
 | Goal | Where to go |
 |---|---|
-| Understand how the layers connect | [Concepts](concepts.md) |
-| Full ecosystem overview | [Ecosystem](ecosystem.md) |
+| Understand how the layers connect | [Ecosystem](ecosystem.md) |
+| Full architecture rationale | [Architecture](architecture.md) |
 | Full install options (editable, from GitHub) | [Installation](installation.md) |
+| Circuit construction API | [rqm-circuits API](api/rqm-circuits-api.md) |
+| User-facing API reference | [rqm-api API](api/rqm-api-api.md) |
+| Backend options | [Backends overview](api/backends.md) |
 | Math API reference | [rqm-core API](api/rqm-core-api.md) |
-| Qiskit execution reference | [rqm-qiskit API](api/rqm-qiskit-api.md) |
