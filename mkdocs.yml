@@ -1,5 +1,5 @@
 site_name: RQM Documentation
-site_description: Official documentation for the RQM quantum geometry ecosystem.
+site_description: Official documentation for the RQM quantum computing platform.
 site_url: https://rqm-technologies-dev.github.io/rqm-docs/
 
 repo_name: RQM-Technologies-dev/rqm-docs
@@ -47,10 +47,19 @@ nav:
       - Home: index.md
       - Quickstart: quickstart.md
       - Ecosystem: ecosystem.md
-      - Optimization: optimization.md
-      - Concepts: concepts.md
       - Architecture: architecture.md
-      - Canonical IR (u1q): compiler/canonical-ir.md
+      - Concepts: concepts.md
+      - Compiler:
+          - Canonical IR (u1q): compiler/canonical-ir.md
+      - API:
+          - rqm-api: api/rqm-api-api.md
+          - rqm-circuits: api/rqm-circuits-api.md
+          - rqm-compiler: api/rqm-compiler-api.md
+          - rqm-core: api/rqm-core-api.md
+          - Backends (Qiskit · Braket · PennyLane): api/backends.md
+          - rqm-qiskit: api/rqm-qiskit-api.md
+      - Notebooks: notebooks.md
+      - Optimization: optimization.md
       - Install: installation.md
       - Deep Dives:
           - Quaternion Intuition: concepts/quaternion-intuition.md
@@ -58,9 +67,5 @@ nav:
           - SU(2) Geometry: concepts/su2-geometry.md
           - Global Phase: concepts/global-phase.md
           - Complete Quaternion Theory: concepts/quaternion-theory.md
-      - Notebooks: notebooks.md
-      - API:
-          - rqm-core API: api/rqm-core-api.md
-          - rqm-qiskit API: api/rqm-qiskit-api.md
   - Quaternionic Signal Processing:
       - Overview: qsp/index.md

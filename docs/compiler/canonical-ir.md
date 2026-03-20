@@ -4,6 +4,29 @@ This page documents the canonical single-qubit intermediate representation (IR) 
 
 ---
 
+## Where This Fits in the Stack
+
+`u1q` is the canonical output of `rqm-compiler`. It sits between circuit construction and execution:
+
+```
+rqm-circuits (circuit objects)
+    │
+    ▼
+rqm-compiler
+  ├── gate resolution (rqm-core)
+  ├── to_u1q_pass  ← single-qubit gates → u1q
+  └── IR output: {u1q + two-qubit ops}
+    │
+    ├──────────────────────┬────────────────────┐
+    ▼                      ▼                    ▼
+rqm-qiskit            rqm-braket          rqm-pennylane
+(u1q → U gate)    (u1q → rotation gate)  (u1q → device op)
+```
+
+The `u1q` IR is what backends consume. No backend re-derives gate semantics — they translate `u1q` to their native rotation primitive.
+
+---
+
 ## What Changed
 
 Before this feature, `rqm-compiler` worked with a fragmented gate set:
@@ -59,7 +82,7 @@ SU(2) double-covers SO(3): `q` and `-q` represent the same physical rotation. Th
 
 ## `to_u1q_pass`: The Canonicalization Pass
 
-`to_u1q_pass` is a compiler pass that converts every single-qubit gate in a circuit to `u1q`. It runs as part of the standard compiler pipeline.
+`to_u1q_pass` is a compiler pass that converts every single-qubit gate in a circuit to `u1q`. It runs as part of the standard compiler pipeline inside `rqm-compiler`.
 
 ### What it does
 
@@ -148,7 +171,7 @@ Examples:
 
 - **Qiskit** → `U` gate / ZYZ decomposition
 - **Amazon Braket** → arbitrary rotation gate
-- **IonQ** → native rotation
+- **PennyLane** → native rotation operation
 
 No guessing or re-analysis of gate semantics is required at the backend level.
 
@@ -160,34 +183,6 @@ Two circuits with identical `u1q` sequences (up to global phase) are guaranteed 
 - Result caching
 - Deduplication
 - Compiler correctness proofs
-
----
-
-## Position in the Stack
-
-`to_u1q_pass` runs inside `rqm-compiler`, between program intake and IR output:
-
-```
-RQMGate list
-    │
-    ▼
-rqm-compiler
-  ├── gate resolution (rqm-core)
-  ├── to_u1q_pass  ← single-qubit gates → u1q
-  └── IR output: {u1q + two-qubit ops}
-    │
-    ├──────────────────┐
-    ▼                  ▼
-rqm-qiskit        rqm-braket
-(u1q → U gate)    (u1q → rotation gate)
-    │                  │
-    └────────┬─────────┘
-             ▼
-        rqm-optimize
-  (quaternion fusion, shortest-path)
-```
-
-The pass produces a normalized IR. The backends and optimizer operate on that IR — they do not re-derive gate semantics.
 
 ---
 
@@ -207,7 +202,7 @@ Most quantum compilers operate as:
 gate → matrix → decomposition
 ```
 
-The RQM compiler now operates as:
+The RQM compiler operates as:
 
 ```text
 geometry → quaternion → canonical IR → execution

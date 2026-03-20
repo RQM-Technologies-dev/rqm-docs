@@ -4,27 +4,46 @@
 
 > **Write once. Run on any quantum backend.**
 
-RQM is a compiler-first quantum software platform that separates mathematical representation, compilation, and execution across multiple quantum backends.
-
-It provides a backend-agnostic workflow where the same program can be compiled and executed on different runtimes such as Qiskit and Amazon Braket.
+RQM is a compiler-first quantum software platform that separates circuit construction, compilation, optimization, and execution across a layered set of focused packages.
 
 ---
 
 ## Architecture Overview
 
-RQM is structured as a layered pipeline from canonical math to backend execution:
+RQM is structured as a layered stack from the user-facing API down to the mathematical foundation:
 
-![RQM architecture: rqm-core feeds into rqm-compiler, which feeds into rqm-qiskit and rqm-braket](assets/images/architecture-diagram.svg)
+```
+┌─────────────────────────────────────────────┐
+│              User Layer                     │
+│         rqm-api · rqm-circuits              │
+└─────────────────┬───────────────────────────┘
+                  │
+┌─────────────────▼───────────────────────────┐
+│            Compiler Layer                   │
+│       rqm-compiler · rqm-optimize           │
+└──────┬──────────────────────┬───────────────┘
+       │                      │
+┌──────▼──────┐  ┌────────────▼──┐  ┌────────────────┐
+│ rqm-qiskit  │  │  rqm-braket   │  │ rqm-pennylane  │
+│  (Qiskit)   │  │  (AWS Braket) │  │  (PennyLane)   │
+└─────────────┘  └───────────────┘  └────────────────┘
+┌─────────────────────────────────────────────┐
+│            Foundation Layer                 │
+│                 rqm-core                    │
+└─────────────────────────────────────────────┘
+```
 
 | Layer | Repository | Responsibility |
 |---|---|---|
-| Math | [`rqm-core`](https://github.com/RQM-Technologies-dev/rqm-core) | Canonical representations: quaternions, spinors, Bloch vectors, SU(2) |
-| Compiler | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) | Instruction generation, gate normalization, and IR lowering |
+| User | [`rqm-api`](https://github.com/RQM-Technologies-dev/rqm-api) | High-level user-facing API for program submission and results |
+| User | [`rqm-circuits`](https://github.com/RQM-Technologies-dev/rqm-circuits) | Circuit construction layer: gates, registers, and circuit objects |
+| Compiler | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) | IR generation, gate normalization, and `u1q` canonical lowering |
+| Compiler | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) | SU(2)-aware circuit optimization and gate fusion |
 | Execution | [`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) | Qiskit circuit execution backend |
 | Execution | [`rqm-braket`](https://github.com/RQM-Technologies-dev/rqm-braket) | AWS Braket execution backend |
-| Optimization | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) | SU(2)-aware circuit optimization and compression layer |
-
-The math layer has no backend dependency. The compiler layer transforms programs into a normalized instruction set. Execution backends consume that normalized form — they do not reimplement math or compiler logic.
+| Execution | [`rqm-pennylane`](https://github.com/RQM-Technologies-dev/rqm-pennylane) | PennyLane integration backend |
+| Foundation | [`rqm-core`](https://github.com/RQM-Technologies-dev/rqm-core) | Canonical math: quaternions, spinors, Bloch vectors, SU(2) |
+| Learning | [`rqm-notebooks`](https://github.com/RQM-Technologies-dev/rqm-notebooks) | Jupyter notebooks: demos and guided learning path |
 
 ---
 
@@ -32,39 +51,25 @@ The math layer has no backend dependency. The compiler layer transforms programs
 
 If you are new to the platform, follow this path:
 
-1. **[Quickstart](quickstart.md)** — install and run your first program in minutes.
-2. **[Understand the ecosystem](ecosystem.md)** — see how each layer connects.
-3. **[Explore the concepts](concepts.md)** — understand compiler-first design and backend abstraction.
-4. **[Browse the API guides](api/rqm-core-api.md)** — reference the key modules and functions.
+1. **[Quickstart](quickstart.md)** — install and run your first circuit in minutes.
+2. **[Ecosystem](ecosystem.md)** — see how each layer connects and what each repo does.
+3. **[Concepts](concepts.md)** — understand compiler-first design and backend abstraction.
+4. **[Notebooks](notebooks.md)** — explore the guided learning path.
 
 ---
 
-## What is RQM?
+## Key Features
 
-RQM is a compiler-first quantum software platform. It separates three concerns that are often conflated in quantum frameworks:
+!!! tip "Canonical IR (`u1q`)"
+    The RQM compiler uses **`u1q`** as its canonical single-qubit gate — a complete SU(2) element encoded as a unit quaternion. The `to_u1q_pass` normalizes all named single-qubit gates (`rx`, `ry`, `rz`, `h`, `s`, `t`, …) to this form, producing a minimal, geometry-grounded IR. See the [Canonical IR guide](compiler/canonical-ir.md).
 
-- **Mathematical representation** — handled by `rqm-core`, which defines canonical quaternion, spinor, and SU(2) structures with no backend dependency.
-- **Compilation** — handled by `rqm-compiler`, which transforms those structures into a normalized instruction set that any backend can consume.
-- **Execution** — handled by `rqm-qiskit` and `rqm-braket`, which map the compiled instructions onto their respective runtimes.
-- **Optimization** — handled by `rqm-optimize`, which applies SU(2)-aware gate fusion and circuit compression before execution.
-
-This separation means the same program can run on Qiskit or Amazon Braket without modification. Swapping backends is a one-line change.
+!!! tip "Multi-backend support"
+    The same program runs on **Qiskit**, **AWS Braket**, and **PennyLane** without modification. Swapping backends is a one-line change. See the [Backends overview](api/backends.md).
 
 ---
 
 !!! note "🔷 Quaternionic Signal Processing (QSP)"
-    RQM now includes **Quaternionic Signal Processing (QSP)** — a framework for applying quaternion-based mathematics to signal processing tasks. See the [QSP Overview](qsp/index.md) for the full stack documentation.
-
-!!! tip "New: Canonical IR (`u1q`) and `to_u1q_pass`"
-    The RQM compiler now uses **`u1q`** as its canonical single-qubit gate — a complete SU(2) element encoded as a unit quaternion. The `to_u1q_pass` converts all named single-qubit gates (`rx`, `ry`, `rz`, `h`, `s`, `t`, …) to this form, producing a minimal, geometry-grounded IR. See the [Canonical IR guide](compiler/canonical-ir.md).
-
-!!! tip "New: rqm-optimize"
-    **rqm-optimize** is now part of the RQM ecosystem — an SU(2)-aware circuit optimization and compression layer. Insert `optimize(qc)` between translation and execution to reduce gate count before hardware runs. See the [Optimization guide](optimization.md).
-
----
-
-!!! tip "New to the platform?"
-    Start with [Quickstart](quickstart.md) for a working example, then read [Concepts](concepts.md) to understand the architecture.
+    RQM also includes **Quaternionic Signal Processing (QSP)** — a framework for applying quaternion-based mathematics to signal processing tasks. See the [QSP Overview](qsp/index.md).
 
 ---
 
