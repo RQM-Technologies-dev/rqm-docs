@@ -45,6 +45,11 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Quickstart: api/quickstart.md
+  - Applications:
+      - Overview: applications/index.md
+      - Optimize Circuits: applications/optimize-circuits.md
+      - Verify Optimizations: applications/verify-optimizations.md
+      - Visualize Quantum Geometry: applications/visualize-quantum-geometry.md
   - API Reference:
       - Overview: api/rqm-api-api.md
       - rqm-circuits: api/rqm-circuits-api.md
