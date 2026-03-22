@@ -72,3 +72,5 @@ nav:
           - SU(2) Geometry: concepts/su2-geometry.md
           - Global Phase: concepts/global-phase.md
           - Complete Quaternion Theory: concepts/quaternion-theory.md
+  - Research:
+      - QCE 2026 Paper Draft: research/qce2026-u1q-paper.md
