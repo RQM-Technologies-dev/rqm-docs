@@ -1,55 +1,99 @@
-# rqm-api API Guide
+# RQM Optimization API — Reference
 
-`rqm-api` is the user-facing API layer for the RQM ecosystem. It coordinates circuit intake, compilation, optional optimization, and backend dispatch in a single unified interface. This page provides an overview of its primary functions and usage patterns.
+`rqm-api` is the HTTP service for geometry-aware quantum circuit optimization. The primary endpoint is `POST /v1/circuits/optimize`.
+
+**Base URL:** `https://rqm-api.onrender.com`
+
+[:material-book-open-variant: Swagger UI](https://rqm-api.onrender.com/docs){ .md-button .md-button--primary }
+[:material-lightning-bolt: API Quickstart](quickstart.md){ .md-button }
+
+---
+
+## Primary Endpoint: `/v1/circuits/optimize`
+
+**`POST /v1/circuits/optimize`**
+
+Upload a quantum circuit. Get back a measurably better one.
+
+What you get back:
+
+- **Optimized circuit** — fewer gates, lower depth
+- **Gate count reduction** — before and after
+- **Depth reduction** — before and after
+- **Canonical structure** — SU(2)-normalized gate representation
+- **Optimization report** — structured summary of all transformations applied
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/circuits/optimize \
+  -H "Content-Type: application/json" \
+  -d @example.json
+```
+
+Use `GET /v1/circuits/example` to get a valid `example.json` payload.
+
+---
+
+## Support Endpoints
+
+### `GET /v1/circuits/example`
+
+Returns a ready-to-use example circuit payload. Use this to test `/optimize` without constructing a circuit manually.
+
+```bash
+curl https://rqm-api.onrender.com/v1/circuits/example
+```
+
+### `POST /v1/circuits/validate`
+
+Checks whether a circuit payload is well-formed. Use this before submitting to `/optimize` if you are constructing circuits programmatically.
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/circuits/validate \
+  -H "Content-Type: application/json" \
+  -d @example.json
+```
+
+### `POST /v1/circuits/analyze`
+
+Returns a structural analysis of the circuit (gate count, depth, gate types) without optimizing it.
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/circuits/analyze \
+  -H "Content-Type: application/json" \
+  -d @example.json
+```
 
 ---
 
 ## Role of `rqm-api`
 
-`rqm-api` is the top of the stack. It is the primary entry point for users who want to run circuits without managing individual layers:
+`rqm-api` is the top of the stack. It coordinates circuit intake, compilation, optimization, and result delivery:
 
 ```
-rqm-circuits (circuit object)
+circuit input (JSON)
     → rqm-api
         ├── rqm-compiler (gate resolution → u1q IR)
-        ├── [optional] rqm-optimize (gate fusion, compression)
-        └── backend dispatch
-              ├── rqm-qiskit
-              ├── rqm-braket
-              └── rqm-pennylane
-    → result
+        ├── rqm-optimize (gate fusion, compression)
+        └── result: optimized circuit + report
 ```
 
 Its responsibilities:
 
-1. **Backend dispatch** — route execution to the correct backend based on the `backend` argument
-2. **Pipeline coordination** — invoke the compiler and optionally the optimizer before execution
-3. **Result normalization** — return a consistent result object regardless of backend
+1. **Circuit intake** — accept and validate circuit payloads
+2. **Pipeline coordination** — invoke the compiler and optimizer
+3. **Result delivery** — return a structured response with optimized circuit and report
 
 ---
 
-## Modules
+## Python SDK
 
-| Module | Responsibility |
-|---|---|
-| `rqm_api.run` | Top-level `run()` function for circuit execution |
-| `rqm_api.result` | `Result` type returned by `run()` |
-| `rqm_api.backends` | Backend registry and backend selection helpers |
-
----
-
-## `rqm_api.run`
-
-### `run`
-
-Compiles and executes a circuit on the specified backend.
+The API is also accessible via the Python SDK. See [SDK Quickstart](../quickstart.md) for setup.
 
 ```python
 from rqm_api import run
 
-result = run(qc, backend="qiskit")
+result = run(qc, backend="qiskit", optimize=True)
 print(result.counts)
-# {"00": 512, "11": 512}
 ```
 
 **Parameters**:
@@ -63,71 +107,15 @@ print(result.counts)
 
 ---
 
-## `rqm_api.result`
+## Troubleshooting
 
-### `Result`
+**Error: `"instructions": ["string"]`**
 
-The normalized result object returned by `run()`.
+This is the default Swagger placeholder. The `instructions` field must contain structured gate objects, not plain strings.
 
-```python
-from rqm_api import run
-
-result = run(qc, backend="braket")
-
-print(result.counts)    # {"00": 512, "11": 512}
-print(result.backend)   # "braket"
-print(result.shots)     # 1024
-```
-
-**Key attributes**:
-
-| Attribute | Description |
-|---|---|
-| `counts` | Dict mapping bitstring to observation count |
-| `backend` | Backend name used for execution |
-| `shots` | Number of measurement shots |
-| `metadata` | Dict with additional backend-specific metadata |
+**Fix:** Use `GET /v1/circuits/example` to get a valid payload, then send that to `POST /v1/circuits/optimize`.
 
 ---
 
-## Usage Examples
-
-### Bell state on Qiskit
-
-```python
-from rqm_circuits import Circuit, Gate
-from rqm_api import run
-
-qc = Circuit(num_qubits=2)
-qc.add(Gate("H", target=0))
-qc.add(Gate("CNOT", control=0, target=1))
-
-result = run(qc, backend="qiskit", shots=1024)
-print(result.counts)
-```
-
-### Same circuit on Braket
-
-```python
-result = run(qc, backend="braket", shots=1024)
-print(result.counts)
-```
-
-### Same circuit on PennyLane
-
-```python
-result = run(qc, backend="pennylane", shots=1024)
-print(result.counts)
-```
-
-### With optimization
-
-```python
-result = run(qc, backend="qiskit", shots=1024, optimize=True)
-print(result.counts)
-```
-
----
-
-!!! note "Full API Reference"
-    Auto-generated API documentation with full signatures, type annotations, and docstrings is planned for a future release. In the meantime, refer to the source code in the [`rqm-api` repository](https://github.com/RQM-Technologies-dev/rqm-api).
+!!! note "Full schema"
+    For request/response schemas and field-level documentation, use the [Swagger UI](https://rqm-api.onrender.com/docs). Auto-generated Python API docs are planned for a future release. In the meantime, refer to the source code in the [`rqm-api` repository](https://github.com/RQM-Technologies-dev/rqm-api).

@@ -1,70 +1,106 @@
-# RQM Documentation
+# RQM Optimization API
 
-**Status:** Active development · Production-ready architecture
+**Geometry-aware quantum circuit optimization as a network service**
 
-> **Write once. Run on any quantum backend.**
+> Upload a quantum circuit. Get back a measurably better one.
 
-RQM is a compiler-first quantum software platform that separates circuit construction, compilation, optimization, and execution across a layered set of focused packages.
+**Public endpoint:** `https://rqm-api.onrender.com`
+
+[:material-book-open-variant: Open API Docs](https://rqm-api.onrender.com/docs){ .md-button .md-button--primary }
 
 ---
 
-## Architecture Overview
+## Try It in 30 Seconds
 
-RQM is structured as a layered stack from the user-facing API down to the mathematical foundation:
+No install required. Use the live Swagger UI.
+
+**Step 1 — Open the API docs**
+
+[https://rqm-api.onrender.com/docs](https://rqm-api.onrender.com/docs)
+
+**Step 2 — Fetch an example circuit**
 
 ```
-┌─────────────────────────────────────────────┐
-│              User Layer                     │
-│         rqm-api · rqm-circuits              │
-└─────────────────┬───────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────┐
-│            Compiler Layer                   │
-│       rqm-compiler · rqm-optimize           │
-└──────┬──────────────────────┬───────────────┘
-       │                      │
-┌──────▼──────┐  ┌────────────▼──┐  ┌────────────────┐
-│ rqm-qiskit  │  │  rqm-braket   │  │ rqm-pennylane  │
-│  (Qiskit)   │  │  (AWS Braket) │  │  (PennyLane)   │
-└─────────────┘  └───────────────┘  └────────────────┘
-┌─────────────────────────────────────────────┐
-│            Foundation Layer                 │
-│                 rqm-core                    │
-└─────────────────────────────────────────────┘
+GET /v1/circuits/example
 ```
 
-| Layer | Repository | Responsibility |
+**Step 3 — Copy the returned JSON**
+
+The response is a valid circuit payload ready to optimize.
+
+**Step 4 — Paste into the optimize endpoint**
+
+```
+POST /v1/circuits/optimize
+```
+
+**Step 5 — Execute and observe**
+
+- reduced gate count
+- reduced depth
+- structured optimization report
+
+---
+
+## What You Get
+
+| Output | Description |
+|---|---|
+| Optimized circuit | The transformed circuit with fewer gates |
+| Gate count reduction | Before/after gate count |
+| Depth reduction | Before/after circuit depth |
+| Canonical structure | SU(2)-normalized gate representation |
+| Optimization report | Structured summary of all transformations applied |
+
+---
+
+## Before / After Example
+
+The following illustrates the structure of an optimization result. Actual reductions depend on the input circuit.
+
+!!! note "Example structure"
+    This is representative of the response format. Use `GET /v1/circuits/example` and `POST /v1/circuits/optimize` on the live API to see real results.
+
+| Metric | Input | Output |
 |---|---|---|
-| User | [`rqm-api`](https://github.com/RQM-Technologies-dev/rqm-api) | High-level user-facing API for program submission and results |
-| User | [`rqm-circuits`](https://github.com/RQM-Technologies-dev/rqm-circuits) | Circuit construction layer: gates, registers, and circuit objects |
-| Compiler | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) | IR generation, gate normalization, and `u1q` canonical lowering |
-| Compiler | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) | SU(2)-aware circuit optimization and gate fusion |
-| Execution | [`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) | Qiskit circuit execution backend |
-| Execution | [`rqm-braket`](https://github.com/RQM-Technologies-dev/rqm-braket) | AWS Braket execution backend |
-| Execution | [`rqm-pennylane`](https://github.com/RQM-Technologies-dev/rqm-pennylane) | PennyLane integration backend |
-| Foundation | [`rqm-core`](https://github.com/RQM-Technologies-dev/rqm-core) | Canonical math: quaternions, spinors, Bloch vectors, SU(2) |
-| Learning | [`rqm-notebooks`](https://github.com/RQM-Technologies-dev/rqm-notebooks) | Jupyter notebooks: demos and guided learning path |
+| Gate count | 12 | 7 |
+| Depth | 8 | 5 |
+| Structure | raw gate sequence | SU(2) canonical form |
 
 ---
 
-## Start Here
+## Who This Is For
 
-If you are new to the platform, follow this path:
-
-1. **[Quickstart](quickstart.md)** — install and run your first circuit in minutes.
-2. **[Ecosystem](ecosystem.md)** — see how each layer connects and what each repo does.
-3. **[Concepts](concepts.md)** — understand compiler-first design and backend abstraction.
-4. **[Notebooks](notebooks.md)** — explore the guided learning path.
+- **Quantum developers** evaluating circuit optimization tooling
+- **Researchers** wanting geometry-correct, reproducible optimization
+- **SDK users** working with Qiskit, Braket, or PennyLane circuits
+- **Internal tooling teams** integrating optimization into a build pipeline
+- **Evaluators** — labs, government programs, and enterprise teams assessing quantum middleware
 
 ---
 
-## Key Features
+## Troubleshooting
 
-!!! tip "Canonical IR (`u1q`)"
-    The RQM compiler uses **`u1q`** as its canonical single-qubit gate — a complete SU(2) element encoded as a unit quaternion. The `to_u1q_pass` normalizes all named single-qubit gates (`rx`, `ry`, `rz`, `h`, `s`, `t`, …) to this form, producing a minimal, geometry-grounded IR. See the [Canonical IR guide](compiler/canonical-ir.md).
+**Common error:** `"instructions": ["string"]`
 
-!!! tip "Multi-backend support"
-    The same program runs on **Qiskit**, **AWS Braket**, and **PennyLane** without modification. Swapping backends is a one-line change. See the [Backends overview](api/backends.md).
+This is a Swagger placeholder. The `instructions` field must be a list of structured gate objects, not plain strings.
+
+**Fix:** Use `GET /v1/circuits/example` to get a valid payload, then submit that to `POST /v1/circuits/optimize`.
+
+---
+
+## Platform Overview
+
+The Optimization API is the primary entry point to the RQM platform. The underlying stack:
+
+| Layer | Package | Responsibility |
+|---|---|---|
+| API | [`rqm-api`](https://github.com/RQM-Technologies-dev/rqm-api) | HTTP service: circuit intake, optimization, results |
+| Compiler | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) | Gate normalization and `u1q` canonical IR |
+| Optimizer | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) | SU(2)-aware gate fusion and compression |
+| Foundation | [`rqm-core`](https://github.com/RQM-Technologies-dev/rqm-core) | Quaternion math, spinors, Bloch vectors |
+
+For architecture details and theory, see [Concepts](concepts.md) and [Ecosystem](ecosystem.md).
 
 ---
 

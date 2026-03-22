@@ -43,24 +43,24 @@ markdown_extensions:
       permalink: true
 
 nav:
-  - Quantum Computing:
-      - Home: index.md
-      - Quickstart: quickstart.md
+  - Home: index.md
+  - Quickstart: api/quickstart.md
+  - API Reference:
+      - Overview: api/rqm-api-api.md
+      - rqm-circuits: api/rqm-circuits-api.md
+      - rqm-compiler: api/rqm-compiler-api.md
+      - rqm-core: api/rqm-core-api.md
+      - Backends (Qiskit · Braket · PennyLane): api/backends.md
+      - rqm-qiskit: api/rqm-qiskit-api.md
+  - Concepts:
+      - Overview: concepts.md
       - Ecosystem: ecosystem.md
       - Architecture: architecture.md
-      - Concepts: concepts.md
-      - Compiler:
-          - Canonical IR (u1q): compiler/canonical-ir.md
-      - API:
-          - rqm-api: api/rqm-api-api.md
-          - rqm-circuits: api/rqm-circuits-api.md
-          - rqm-compiler: api/rqm-compiler-api.md
-          - rqm-core: api/rqm-core-api.md
-          - Backends (Qiskit · Braket · PennyLane): api/backends.md
-          - rqm-qiskit: api/rqm-qiskit-api.md
-      - Notebooks: notebooks.md
       - Optimization: optimization.md
+      - Canonical IR (u1q): compiler/canonical-ir.md
+      - Notebooks: notebooks.md
       - Install: installation.md
+      - SDK Quickstart: quickstart.md
       - Deep Dives:
           - Quaternion Intuition: concepts/quaternion-intuition.md
           - Spinors and the Bloch Sphere: concepts/spinor-bloch.md
