@@ -67,5 +67,3 @@ nav:
           - SU(2) Geometry: concepts/su2-geometry.md
           - Global Phase: concepts/global-phase.md
           - Complete Quaternion Theory: concepts/quaternion-theory.md
-  - Quaternionic Signal Processing:
-      - Overview: qsp/index.md

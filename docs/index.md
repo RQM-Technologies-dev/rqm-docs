@@ -104,9 +104,4 @@ For architecture details and theory, see [Concepts](concepts.md) and [Ecosystem]
 
 ---
 
-!!! note "🔷 Quaternionic Signal Processing (QSP)"
-    RQM also includes **Quaternionic Signal Processing (QSP)** — a framework for applying quaternion-based mathematics to signal processing tasks. See the [QSP Overview](qsp/index.md).
-
----
-
 🌐 **Website:** [https://rqmtechnologies.com](https://rqmtechnologies.com)
