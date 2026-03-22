@@ -6,40 +6,32 @@
     **Type:** Full Research Paper (RESP)  
     **Abstract deadline:** April 6, 2026 (AoE)  
     **Full paper deadline:** April 13, 2026 (AoE)  
-    **Format:** IEEE IEEEtran 10pt conference style, 8–10 content pages + up to 2 reference pages
+    **Format:** IEEE IEEEtran 10pt conference style, 8–10 content pages + up to 2 reference pages  
+    **Template:** [IEEE Conference Template (Letter, PDF)](../assets/conference-template-letter.pdf)
 
 ---
 
-## Abstract
+*Author 1 Given Name Surname*  
+dept. name of organization (of Affiliation)  
+name of organization (of Affiliation)  
+City, Country  
+email address or ORCID
 
-Quantum circuit optimization pipelines commonly operate over **named gate syntax**, treating
-optimization as a pattern-matching problem over symbolic gate names and parameter values.
-This approach is fragile: semantically identical single-qubit operations appear in many
-syntactic forms, and optimization boundaries are ad-hoc rather than principled.
-
-We introduce **u1q**, a backend-agnostic canonical intermediate representation (IR) for
-single-qubit quantum operations. u1q encodes every single-qubit gate as a unit quaternion
-`(w, x, y, z)` — a compact, algebraically exact representation of SU(2). The accompanying
-**`to_u1q_pass`** normalizes heterogeneous gate syntax into u1q, establishing a deterministic
-canonicalization boundary before downstream optimization.
-
-Built on u1q, the RQM compiler pipeline implements quaternion fusion (collapsing consecutive
-single-qubit gates via quaternion multiplication), geodesic rotation selection (enforcing the
-shorter arc on SU(2)), and backend-specific decomposition. All optimization passes reason
-geometrically about gate equivalence rather than symbolically about gate names.
-
-We evaluate the system on a benchmark suite of circuits targeting Qiskit, Amazon Braket, and
-PennyLane backends. Results show measurable reductions in single-qubit gate count and circuit
-depth while preserving semantic equivalence via unitary consistency checks. The full stack —
-rqm-core, rqm-compiler, rqm-api, and backend adapters — is publicly accessible as a live
-optimization service.
-
-**Keywords:** quantum circuit optimization, intermediate representation, SU(2), quaternions,
-compiler design, backend-agnostic compilation, gate fusion, quantum software engineering
+*Author 2 Given Name Surname*  
+dept. name of organization (of Affiliation)  
+name of organization (of Affiliation)  
+City, Country  
+email address or ORCID
 
 ---
 
-## 1. Introduction
+*Abstract*—Quantum circuit optimization pipelines commonly operate over named gate syntax, treating optimization as a pattern-matching problem over symbolic gate names and parameter values. This approach is fragile: semantically identical single-qubit operations appear in many syntactic forms, and optimization boundaries are ad-hoc rather than principled. We introduce u1q, a backend-agnostic canonical intermediate representation (IR) for single-qubit quantum operations. u1q encodes every single-qubit gate as a unit quaternion (w, x, y, z) — a compact, algebraically exact representation of SU(2). The accompanying to_u1q_pass normalizes heterogeneous gate syntax into u1q, establishing a deterministic canonicalization boundary before downstream optimization. Built on u1q, the RQM compiler pipeline implements quaternion fusion (collapsing consecutive single-qubit gates via quaternion multiplication), geodesic rotation selection (enforcing the shorter arc on SU(2)), and backend-specific decomposition. All optimization passes reason geometrically about gate equivalence rather than symbolically about gate names. We evaluate the system on a benchmark suite of circuits targeting Qiskit, Amazon Braket, and PennyLane backends. Results show measurable reductions in single-qubit gate count and circuit depth while preserving semantic equivalence via unitary consistency checks. The full stack — rqm-core, rqm-compiler, rqm-api, and backend adapters — is publicly accessible as a live optimization service.
+
+*Keywords*—quantum circuit optimization, intermediate representation, SU(2), quaternions, compiler design, backend-agnostic compilation, gate fusion, quantum software engineering
+
+---
+
+## I. Introduction
 
 Quantum computing increasingly demands software infrastructure that is correct, reproducible,
 and backend-portable. As hardware diversity grows — with gate sets, native bases, and
@@ -78,9 +70,9 @@ evaluation reproducible by external users.
 
 ---
 
-## 2. Background and Motivation
+## II. Background and Motivation
 
-### 2.1 SU(2) as the Single-Qubit Action Space
+### A. SU(2) as the Single-Qubit Action Space
 
 A single-qubit gate is a 2×2 complex unitary matrix of determinant 1 — an element of SU(2).
 Up to global phase, SU(2) is the complete space of single-qubit operations. Any optimization
@@ -90,24 +82,24 @@ A general rotation by angle θ about unit axis n̂ = (nₓ, n_y, n_z) correspond
 element:
 
 ```
-U(n̂, θ) = exp(−i (θ/2) n̂ · σ) = cos(θ/2)·I − i sin(θ/2)·(n̂ · σ)
+U(n̂, θ) = exp(−i (θ/2) n̂ · σ) = cos(θ/2)·I − i sin(θ/2)·(n̂ · σ)    (1)
 ```
 
 where σ = (σₓ, σ_y, σ_z) are the Pauli matrices.
 
-### 2.2 Unit Quaternions as a Compact Representation of SU(2)
+### B. Unit Quaternions as a Compact Representation of SU(2)
 
 SU(2) is isomorphic to the unit 3-sphere S³. Every unit quaternion
 
 ```
-q = w + xi + yj + zk,    w² + x² + y² + z² = 1
+q = w + xi + yj + zk,    w² + x² + y² + z² = 1    (2)
 ```
 
 corresponds exactly to one SU(2) element via:
 
 ```
 U(q) = [ w + iz    y + ix ]
-       [-y + ix    w - iz ]
+       [-y + ix    w - iz ]    (3)
 ```
 
 This is an algebraic isomorphism, not an approximation. Quaternion multiplication corresponds
@@ -116,20 +108,20 @@ to gate composition; quaternion conjugation corresponds to gate inversion.
 The axis-angle form is:
 
 ```
-q = cos(θ/2) + û sin(θ/2)
+q = cos(θ/2) + û sin(θ/2)    (4)
 ```
 
 where û is a unit pure quaternion encoding the rotation axis and θ is the physical rotation
 angle in Bloch-sphere space. The factor of 2 between quaternion angle and physical rotation
 angle is the spinorial structure of SU(2).
 
-### 2.3 Global Phase and Canonical Choice
+### C. Global Phase and Canonical Choice
 
 SU(2) double-covers SO(3): both `q` and `−q` represent the same physical rotation. For compiler
 purposes, this means a canonical representative must be chosen. We canonicalize by enforcing
 `w ≥ 0`, selecting the geodesically shorter arc on S³ and ensuring deterministic output.
 
-### 2.4 Why a Canonical IR is Useful in Compiler Design
+### D. Why a Canonical IR is Useful in Compiler Design
 
 A canonical IR serves as a **normalization boundary**: all upstream representations collapse
 to a single form, and all downstream passes and backends receive a guaranteed-normal input.
@@ -139,12 +131,12 @@ algebraic structure of SU(2).
 
 ---
 
-## 3. System Overview
+## III. System Overview
 
-The RQM platform is organized as a layered compiler stack. Figure 1 shows the end-to-end
+The RQM platform is organized as a layered compiler stack. Fig. 1 shows the end-to-end
 pipeline from user-supplied circuit to optimized output.
 
-**Figure 1. RQM end-to-end compiler pipeline**
+**Fig. 1. RQM end-to-end compiler pipeline**
 
 ```
 User circuit (gate list)
@@ -192,9 +184,9 @@ semantics.
 
 ---
 
-## 4. Canonical IR: u1q
+## IV. Canonical IR: u1q
 
-### 4.1 Definition
+### A. Definition
 
 **u1q** is the canonical single-qubit gate in the RQM compiler IR. It is defined as:
 
@@ -205,7 +197,7 @@ semantics.
 where `(w, x, y, z)` is a unit quaternion satisfying:
 
 ```
-w² + x² + y² + z² = 1
+w² + x² + y² + z² = 1    (5)
 ```
 
 The four components encode a complete SU(2) element. The unit quaternion corresponds to the
@@ -213,10 +205,10 @@ SU(2) matrix:
 
 ```
 U = [ w + iz    y + ix ]
-    [-y + ix    w - iz ]
+    [-y + ix    w - iz ]    (6)
 ```
 
-### 4.2 Invariance and Normalization Constraints
+### B. Invariance and Normalization Constraints
 
 The u1q IR enforces the following invariants at the canonicalization boundary:
 
@@ -230,7 +222,7 @@ The `w ≥ 0` constraint resolves the SU(2) double-cover ambiguity by selecting 
 representative quaternion in the upper hemisphere of S³, corresponding to the physically
 shorter rotation arc.
 
-### 4.3 Validation Boundary
+### C. Validation Boundary
 
 The pass enforces two distinct operations:
 
@@ -243,9 +235,9 @@ The pass enforces two distinct operations:
 This separation is a deliberate design decision: validation is a **correctness guarantee**;
 renormalization is a **numerical service**.
 
-### 4.4 Gate-to-u1q Mapping
+### D. Gate-to-u1q Mapping
 
-**Table 1. Canonical gate-to-u1q mapping**
+**Table I. Canonical gate-to-u1q mapping**
 
 | Gate | w | x | y | z | Notes |
 |---|---|---|---|---|---|
@@ -264,7 +256,7 @@ renormalization is a **numerical service**.
 Mappings are derived from the SU(2) correspondence `q = cos(θ/2) + û sin(θ/2)` with a fixed
 sign convention applied consistently throughout the stack.
 
-### 4.5 Formal Guarantees
+### E. Formal Guarantees
 
 > Any supported single-qubit gate is lowered to the same canonical representational space
 > before downstream optimization.
@@ -273,7 +265,7 @@ This guarantee establishes u1q as a **strong normalization boundary**: optimizat
 need not handle gate aliases, parameter variants, or backend-specific gate names. Every
 single-qubit operation is a unit quaternion; composition is quaternion multiplication.
 
-### 4.6 Canonical Constant
+### F. Canonical Constant
 
 ```python
 CANONICAL_SINGLE_QUBIT_GATE = "u1q"
@@ -286,12 +278,12 @@ update rather than a search-and-replace across the codebase.
 
 ---
 
-## 5. Compiler Passes and Optimization Strategy
+## V. Compiler Passes and Optimization Strategy
 
 The RQM compiler applies a sequence of passes to the circuit IR. Passes are organized into
 two categories: implemented and planned. This section describes both.
 
-### 5.1 Implemented Passes
+### A. Implemented Passes
 
 **Pass 1: Gate Resolution (rqm-core)**
 
@@ -302,7 +294,7 @@ correspondence before `to_u1q_pass` is applied.
 **Pass 2: `to_u1q_pass` (Canonicalization)**
 
 The core normalization pass. It traverses the instruction list and converts every single-qubit
-gate to u1q using the gate-to-quaternion mapping in Table 1. Two-qubit gates (CNOT, CZ, SWAP,
+gate to u1q using the gate-to-quaternion mapping in Table I. Two-qubit gates (CNOT, CZ, SWAP,
 iSWAP) are left unchanged; they act as segment boundaries. After this pass, the IR contains
 only `u1q` and explicit two-qubit operations.
 
@@ -311,7 +303,7 @@ only `u1q` and explicit two-qubit operations.
 Consecutive `u1q` gates on the same qubit are fused by quaternion multiplication:
 
 ```
-q_fused = q₂ · q₁
+q_fused = q₂ · q₁    (7)
 ```
 
 Three u1q gates in sequence collapse to one. The fused quaternion is re-canonicalized after
@@ -349,7 +341,7 @@ Each backend adapter translates u1q to its native rotation primitive:
 
 Decomposition is performed once per backend and requires no knowledge of the input gate syntax.
 
-### 5.2 Planned Passes
+### B. Planned Passes
 
 The following passes are on the roadmap but not yet implemented:
 
@@ -364,9 +356,9 @@ The following passes are on the roadmap but not yet implemented:
 
 ---
 
-## 6. API and Backend Realization
+## VI. API and Backend Realization
 
-### 6.1 Optimization Endpoint
+### A. Optimization Endpoint
 
 The `rqm-api` package exposes the full pipeline as an HTTP REST service:
 
@@ -409,7 +401,7 @@ The `rqm-api` package exposes the full pipeline as an HTTP REST service:
 The response always includes a structured optimization report alongside the optimized circuit,
 enabling downstream analysis and reproducibility logging.
 
-### 6.2 Support Endpoints
+### B. Support Endpoints
 
 | Endpoint | Method | Description |
 |---|---|---|
@@ -418,7 +410,7 @@ enabling downstream analysis and reproducibility logging.
 | `/v1/circuits/analyze` | POST | Returns circuit metrics without optimization |
 | `/v1/circuits/optimize` | POST | Full pipeline: compile → optimize → report |
 
-### 6.3 Python SDK
+### C. Python SDK
 
 ```python
 from rqm_api import run
@@ -430,7 +422,7 @@ print(result.counts)
 The SDK accepts `rqm_circuits.Circuit` objects and returns a structured `Result` object. The
 `optimize=True` flag engages the full rqm-optimize pass sequence before execution.
 
-### 6.4 Reproducibility
+### D. Reproducibility
 
 The API is publicly accessible without authentication for evaluation purposes. Any submitted
 circuit produces a deterministic optimization result — the same input yields the same output
@@ -439,9 +431,9 @@ quaternion arithmetic, not by heuristic search.
 
 ---
 
-## 7. Experimental Methodology
+## VII. Experimental Methodology
 
-### 7.1 Benchmark Circuit Set
+### A. Benchmark Circuit Set
 
 We evaluate on a benchmark suite composed of three circuit families:
 
@@ -456,13 +448,13 @@ Circuits in the rotation-heavy family are designed to exercise the quaternion fu
 directly. Standard-gate circuits test the identity elimination pass. Mixed circuits assess
 end-to-end pipeline behavior.
 
-### 7.2 Backends Evaluated
+### B. Backends Evaluated
 
 - **Qiskit Aer simulator** (local, statevector mode)
 - **Amazon Braket local simulator**
 - **PennyLane default.qubit**
 
-### 7.3 Optimization Baseline
+### C. Optimization Baseline
 
 Each circuit is evaluated in two configurations:
 
@@ -473,7 +465,7 @@ Each circuit is evaluated in two configurations:
 We do not compare against third-party transpiler optimization levels in this evaluation.
 Comparison against Qiskit transpiler optimization levels is reserved for future work.
 
-### 7.4 Metrics
+### D. Metrics
 
 | Metric | Definition |
 |---|---|
@@ -489,28 +481,28 @@ The u1q optimization pipeline operates exclusively on single-qubit gate segments
 gate counts should not change as a result of the optimization passes described here. Any
 reported reduction in total gate count is attributable to single-qubit simplifications.
 
-### 7.5 Semantic Equivalence Verification
+### E. Semantic Equivalence Verification
 
 For each benchmark circuit, we verify that the optimized circuit is semantically equivalent
 to the original by comparing their full unitary matrices:
 
 ```
-‖U_original − U_optimized‖_F < 1e-9
+‖U_original − U_optimized‖_F < 1e-9    (8)
 ```
 
 Circuits that fail equivalence verification are excluded from the results table and flagged.
 
 ---
 
-## 8. Results
+## VIII. Results
 
 !!! warning "Placeholder — to be populated with benchmark data"
     The tables and figures in this section contain illustrative structure. Replace with actual
     benchmark results before submission.
 
-### 8.1 Benchmark Summary
+### A. Benchmark Summary
 
-**Table 2. Benchmark results summary**
+**Table II. Benchmark results summary**
 
 | Circuit | Qubits | Gates (baseline) | Gates (opt.) | Reduction | Depth (baseline) | Depth (opt.) | Equiv. |
 |---|---|---|---|---|---|---|---|
@@ -522,9 +514,9 @@ Circuits that fail equivalence verification are excluded from the results table 
 
 *All optimized circuits pass unitary equivalence verification.*
 
-### 8.2 Single-Qubit Gate Count Reduction
+### B. Single-Qubit Gate Count Reduction
 
-**Figure 2 (placeholder): Relative single-qubit gate-count reduction by circuit family**
+**Fig. 2 (placeholder): Relative single-qubit gate-count reduction by circuit family**
 
 ```
 Rotation-heavy  ████████████████████  [e.g., ~45% reduction]
@@ -546,9 +538,9 @@ Key observations:
 - **Two-qubit gate counts are unchanged** in all cases, confirming that reported gains are
   caused by the single-qubit optimization passes.
 
-### 8.3 Depth Reduction
+### C. Depth Reduction
 
-**Figure 3 (placeholder): Circuit depth before and after optimization, per backend**
+**Fig. 3 (placeholder): Circuit depth before and after optimization, per backend**
 
 *[Replace with actual per-backend depth comparison from benchmark runs.]*
 
@@ -558,7 +550,7 @@ Observed trends:
 - For circuits where two-qubit gates dominate the critical path, depth reduction is lower, consistent with the current scope of the optimization pipeline.
 - Backend-specific decomposition (u1q → native basis) can introduce one additional gate layer in some cases, partially eroding depth gains. This effect is measured and reported per backend.
 
-### 8.4 Compilation Latency
+### D. Compilation Latency
 
 Pipeline latency (wall-clock, ms) across benchmark circuits:
 
@@ -575,9 +567,9 @@ Pipeline latency (wall-clock, ms) across benchmark circuits:
 
 ---
 
-## 9. Ablation Analysis
+## IX. Ablation Analysis
 
-**Table 3. Ablation results — single-qubit gate count reduction across pass configurations**
+**Table III. Ablation results — single-qubit gate count reduction across pass configurations**
 
 | Configuration | Rotation-heavy | Standard gates | Mixed/random |
 |---|---|---|---|
@@ -601,23 +593,23 @@ pipeline, not by incidental differences in backend translation or circuit normal
 
 ---
 
-## 10. Limitations and Threats to Validity
+## X. Limitations and Threats to Validity
 
-### 10.1 Scope of the Current IR
+### A. Scope of the Current IR
 
 The u1q canonicalization and all implemented optimization passes operate exclusively on
 **single-qubit gate segments**. Two-qubit gate optimization is not addressed in this work.
 Circuits where two-qubit gates dominate the total gate count will see minimal improvement from
 the current pipeline.
 
-### 10.2 Benchmark Distribution
+### B. Benchmark Distribution
 
 The benchmark suite is constructed to exercise the implemented passes. Circuits drawn from
 real quantum applications — variational algorithms, error correction, chemistry simulation —
 may have different distributions of single-qubit gate redundancy. Results on application
 circuits should be verified separately.
 
-### 10.3 Backend Translation Effects
+### C. Backend Translation Effects
 
 Decomposing u1q to backend-native gate sets can introduce additional gates (e.g., a ZYZ
 decomposition of a u1q gate requires up to three basis gates on some backends). In circuits
@@ -625,14 +617,14 @@ with few redundant single-qubit gates, this backend overhead can offset the gain
 fusion and identity elimination. We measure and report this effect per backend, but it
 remains a limitation of the current architecture.
 
-### 10.4 Incomplete Pass Coverage
+### D. Incomplete Pass Coverage
 
 Several planned passes (commutation analysis, peephole optimization, hardware-native
 shortest-path decomposition) are not yet implemented. Comparison against fully optimized
 Qiskit transpiler pipelines is therefore not yet meaningful; we compare only against our
 own baseline (no-optimization configuration).
 
-### 10.5 Interaction with Hardware-Native Compilation
+### E. Interaction with Hardware-Native Compilation
 
 When circuits are submitted to real hardware, provider-side compilation stages apply
 additional optimization after the RQM pipeline. The interaction between RQM optimization
@@ -640,23 +632,23 @@ output and provider-side transpilation is not characterized in this evaluation.
 
 ---
 
-## 11. Related Work
+## XI. Related Work
 
-### 11.1 Mainstream Transpiler Pipelines
+### A. Mainstream Transpiler Pipelines
 
-Qiskit's transpiler [Qiskit 2024] applies optimization at multiple levels (O0–O3), including
-routing, basis translation, and peephole rewriting. PennyLane [Bergholm 2018] applies
-device-specific compilation and supports differentiable optimization. Amazon Braket [Amazon
-2020] provides device-level compilation through provider SDKs.
+Qiskit's transpiler [1] applies optimization at multiple levels (O0–O3), including
+routing, basis translation, and peephole rewriting. PennyLane [2] applies
+device-specific compilation and supports differentiable optimization. Amazon Braket [3]
+provides device-level compilation through provider SDKs.
 
 These pipelines share a common structure: circuits are expressed in named-gate syntax, and
 optimization applies pattern-matching and rewrite rules over that syntax. The RQM approach
 differs by establishing a **quaternionic normalization boundary** before any optimization
 pass, ensuring all single-qubit reasoning is geometrically exact.
 
-### 11.2 IR-Centric Compiler Approaches
+### B. IR-Centric Compiler Approaches
 
-The MLIR [Lattner 2021] ecosystem and its quantum extensions (QMLIR, Catalyst [Bergholm 2024])
+The MLIR [4] ecosystem and its quantum extensions (QMLIR, Catalyst [5])
 demonstrate the value of multi-level IRs for quantum compilation. These systems introduce
 multiple abstraction levels and progressive lowering. u1q is a specific canonical IR at the
 single-qubit level, complementary to (rather than competing with) multi-level IR frameworks.
@@ -665,15 +657,15 @@ LLVM-style IR design principles — strong typing, normalization boundaries, sin
 form — inform the u1q design. The contribution is not the concept of an IR, but the specific
 choice of unit quaternions as the canonical form for single-qubit SU(2) operations.
 
-### 11.3 Gate Rewriting and Peephole Optimization
+### C. Gate Rewriting and Peephole Optimization
 
-Clifford circuit optimization [Bravyi 2021, Duncan 2020] applies ZX-calculus rewrite rules to
-reduce Clifford gate counts. Template-based optimization [Maslov 2008] identifies and replaces
-fixed gate patterns. PyZX [Kissinger 2020] applies graph-based rewriting. These approaches are
+Clifford circuit optimization [6, 7] applies ZX-calculus rewrite rules to
+reduce Clifford gate counts. Template-based optimization [8] identifies and replaces
+fixed gate patterns. PyZX [9] applies graph-based rewriting. These approaches are
 complementary to u1q: they operate at a higher or more specialized level of abstraction, while
 u1q targets the continuous single-qubit gate segment as its primary optimization domain.
 
-### 11.4 Quaternion Representations in Quantum Computing
+### D. Quaternion Representations in Quantum Computing
 
 Quaternions have appeared in quantum computing contexts primarily for **state visualization**
 (Bloch sphere representations) and for **robotics-inspired gate decomposition**. Their use
@@ -686,7 +678,7 @@ complete, usable optimization pipeline on top of that boundary.
 
 ---
 
-## 12. Conclusion
+## XII. Conclusion
 
 We introduced **u1q**, a canonical single-qubit intermediate representation encoding SU(2)
 elements as unit quaternions `(w, x, y, z)`, and the **`to_u1q_pass`** that maps heterogeneous
@@ -705,24 +697,31 @@ stages. The quaternionic IR boundary is a stable foundation for this broader com
 
 ---
 
+## Acknowledgment
+
+!!! note "Placeholder"
+    Identify applicable funding agency here. If none, delete this section before submission.
+
+---
+
 ## References
 
 !!! warning "Placeholder references — populate before submission"
 
-[Amazon 2020] Amazon Web Services. *Amazon Braket.* https://aws.amazon.com/braket/, 2020.
+[1] Qiskit contributors, "Qiskit: An open-source framework for quantum computing," 2024. [Online]. Available: https://github.com/Qiskit/qiskit
 
-[Bergholm 2018] Bergholm, V. et al. *PennyLane: Automatic differentiation of hybrid quantum-classical computations.* arXiv:1811.04968, 2018.
+[2] V. Bergholm et al., "PennyLane: Automatic differentiation of hybrid quantum-classical computations," arXiv:1811.04968, 2018.
 
-[Bergholm 2024] Bergholm, V. et al. *Catalyst: A Python-first compiler for quantum programs.* PennyLane documentation, 2024.
+[3] Amazon Web Services, "Amazon Braket," 2020. [Online]. Available: https://aws.amazon.com/braket/
 
-[Bravyi 2021] Bravyi, S., Hu, S., Maslov, D., Shaydulin, R. *Clifford circuit optimization with templates and symbolic Pauli gates.* Quantum 5, 580, 2021.
+[4] C. Lattner et al., "MLIR: Scaling compiler infrastructure for domain specific computation," in *Proc. IEEE/ACM CGO*, 2021.
 
-[Duncan 2020] Duncan, R., Kissinger, A., Perdrix, S., van de Wetering, J. *Graph-theoretic simplification of quantum circuits with the ZX-calculus.* Quantum 4, 279, 2020.
+[5] V. Bergholm et al., "Catalyst: A Python-first compiler for quantum programs," PennyLane documentation, 2024.
 
-[Kissinger 2020] Kissinger, A., van de Wetering, J. *PyZX: Large scale automated diagrammatic reasoning.* Proceedings of QPL 2019. EPTCS 318, 2020.
+[6] S. Bravyi, S. Hu, D. Maslov, and R. Shaydulin, "Clifford circuit optimization with templates and symbolic Pauli gates," *Quantum*, vol. 5, p. 580, 2021.
 
-[Lattner 2021] Lattner, C. et al. *MLIR: Scaling compiler infrastructure for domain specific computation.* IEEE/ACM CGO 2021.
+[7] R. Duncan, A. Kissinger, S. Perdrix, and J. van de Wetering, "Graph-theoretic simplification of quantum circuits with the ZX-calculus," *Quantum*, vol. 4, p. 279, 2020.
 
-[Maslov 2008] Maslov, D., Dueck, G.W., Miller, D.M., Negrevergne, C. *Quantum circuit simplification and level compaction.* IEEE TCAD, 27(3), 2008.
+[8] D. Maslov, G. W. Dueck, D. M. Miller, and C. Negrevergne, "Quantum circuit simplification and level compaction," *IEEE Trans. Comput.-Aided Design Integr. Circuits Syst.*, vol. 27, no. 3, 2008.
 
-[Qiskit 2024] Qiskit contributors. *Qiskit: An open-source framework for quantum computing.* https://github.com/Qiskit/qiskit, 2024.
+[9] A. Kissinger and J. van de Wetering, "PyZX: Large scale automated diagrammatic reasoning," in *Proc. QPL 2019*, EPTCS 318, 2020.
