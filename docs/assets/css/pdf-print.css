@@ -1,0 +1,70 @@
+/* Print / PDF export styles for the QCE 2026 Paper Draft page */
+@media print {
+  /* Hide site chrome */
+  .md-header,
+  .md-tabs,
+  .md-sidebar,
+  .md-footer,
+  .md-search,
+  .md-source,
+  [data-md-component="skip"],
+  .md-top,
+  .headerlink,
+  .rqm-pdf-export-btn {
+    display: none !important;
+  }
+
+  /* Expand the content area to full width */
+  .md-main__inner,
+  .md-content {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .md-content__inner {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Ensure proper page breaks */
+  h1, h2, h3, h4 {
+    page-break-after: avoid;
+  }
+
+  pre, blockquote, table, figure {
+    page-break-inside: avoid;
+  }
+
+  /* Use black text on white background */
+  body {
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  a {
+    color: #000 !important;
+    text-decoration: underline;
+  }
+
+  /* Show link URLs for references */
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+    color: #555;
+  }
+
+  /* Ensure code blocks print legibly */
+  pre, code {
+    border: 1px solid #ccc !important;
+    background: #f8f8f8 !important;
+    color: #000 !important;
+    font-size: 0.85em;
+  }
+
+  /* Admonition boxes */
+  .admonition {
+    border: 1px solid #ccc !important;
+    background: #f9f9f9 !important;
+  }
+}
