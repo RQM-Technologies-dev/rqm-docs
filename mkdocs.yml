@@ -42,6 +42,12 @@ markdown_extensions:
   - toc:
       permalink: true
 
+extra_javascript:
+  - assets/js/pdf-export.js
+
+extra_css:
+  - assets/css/pdf-print.css
+
 nav:
   - Home: index.md
   - Quickstart: api/quickstart.md
