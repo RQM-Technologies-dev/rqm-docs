@@ -1,5 +1,5 @@
-site_name: RQM Documentation
-site_description: Official documentation for the RQM quantum computing platform.
+site_name: RQM Platform
+site_description: RQM — geometry-aware quantum optimization and execution platform. Optimize circuits, execute on Qiskit and Braket, and get structured results.
 site_url: https://rqm-technologies-dev.github.io/rqm-docs/
 
 repo_name: RQM-Technologies-dev/rqm-docs
@@ -45,13 +45,15 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Quickstart: api/quickstart.md
-  - Applications:
+  - Studio:
       - Overview: applications/index.md
       - Optimize Circuits: applications/optimize-circuits.md
       - Verify Optimizations: applications/verify-optimizations.md
       - Visualize Quantum Geometry: applications/visualize-quantum-geometry.md
   - API Reference:
       - Overview: api/rqm-api-api.md
+      - API Quickstart: api/quickstart.md
+      - Execution: api/execution.md
       - rqm-circuits: api/rqm-circuits-api.md
       - rqm-compiler: api/rqm-compiler-api.md
       - rqm-core: api/rqm-core-api.md

@@ -1,12 +1,63 @@
-# RQM Optimization API
+# RQM Platform
 
-**Geometry-aware quantum circuit optimization as a network service**
+**Geometry-aware quantum optimization and execution platform**
 
-> Upload a quantum circuit. Get back a measurably better one.
+> Upload a circuit → optimize it → execute it → get results
 
 **Public endpoint:** `https://rqm-api.onrender.com`
 
-[:material-book-open-variant: Open API Docs](https://rqm-api.onrender.com/docs){ .md-button .md-button--primary }
+[:material-lightning-bolt: Try API](https://rqm-api.onrender.com/docs){ .md-button .md-button--primary }
+[:material-monitor: Open Studio](https://rqmtechnologies.com){ .md-button }
+[:material-book-open-variant: View Docs](api/quickstart.md){ .md-button }
+
+---
+
+## What RQM Does
+
+RQM is a quantum optimization and execution platform. It sits between circuit creation and hardware execution, providing:
+
+| Component | Package | Role |
+|---|---|---|
+| Circuit IR | [`rqm-circuits`](https://github.com/RQM-Technologies-dev/rqm-circuits) | Canonical, backend-agnostic circuit representation |
+| Optimization engine | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) + [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) | SU(2)-aware gate fusion and circuit compression |
+| Execution + orchestration | [`rqm-api`](https://github.com/RQM-Technologies-dev/rqm-api) | HTTP service: optimize, execute, retrieve results |
+| UI interface | [RQM Studio](https://rqmtechnologies.com) | Visual layer for circuit workflows |
+
+---
+
+## Platform Architecture
+
+```
+User circuit (JSON or SDK)
+        │
+        ▼
+   ┌─────────┐
+   │ rqm-api │  ← service layer: optimize + execute
+   └────┬────┘
+        │
+   ┌────▼─────────┐
+   │ rqm-circuits │  ← canonical IR layer
+   └────┬─────────┘
+        │
+   ┌────▼──────────────────┐
+   │ rqm-compiler          │  ← optimization
+   │ + rqm-optimize        │
+   └────┬──────────────────┘
+        │
+   ┌────┴───────────────────────┐
+   │                            │
+   ▼                            ▼
+rqm-qiskit                 rqm-braket
+(IBM / Qiskit execution)   (AWS Braket execution)
+        │                            │
+        └────────────┬───────────────┘
+                     ▼
+               result + report
+```
+
+RQM Studio provides a UI on top of `rqm-api`, enabling visual circuit workflows and result inspection.
+
+For a full walkthrough of the stack, see [Ecosystem](ecosystem.md) and [Architecture](architecture.md).
 
 ---
 
@@ -26,19 +77,48 @@ GET /v1/circuits/example
 
 **Step 3 — Copy the returned JSON**
 
-The response is a valid circuit payload ready to optimize.
+The response is a valid circuit payload ready to use.
 
-**Step 4 — Paste into the optimize endpoint**
+**Step 4 — Optimize the circuit**
 
 ```
 POST /v1/circuits/optimize
 ```
 
-**Step 5 — Execute and observe**
+**Step 5 — Observe the result**
 
 - reduced gate count
 - reduced depth
 - structured optimization report
+
+**Step 6 — Execute (optional)**
+
+Send the optimized circuit to a real backend:
+
+```
+POST /v1/execute/qiskit
+```
+
+or
+
+```
+POST /v1/execute/braket
+```
+
+---
+
+## Execution
+
+RQM supports circuit execution via two backends:
+
+| Backend | Endpoint | Runtime |
+|---|---|---|
+| IBM Qiskit | `POST /v1/execute/qiskit` | Qiskit Aer simulator / IBM hardware |
+| Amazon Braket | `POST /v1/execute/braket` | Braket local simulator / AWS hardware |
+
+Execution requests accept an optimized circuit and a shot count. Responses include measurement results and job metadata.
+
+For full endpoint details, see the [Execution reference](api/execution.md).
 
 ---
 
@@ -51,21 +131,19 @@ POST /v1/circuits/optimize
 | Depth reduction | Before/after circuit depth |
 | Canonical structure | SU(2)-normalized gate representation |
 | Optimization report | Structured summary of all transformations applied |
+| Execution results | Measurement counts from Qiskit or Braket |
 
 ---
 
-## Before / After Example
+## Where RQM Fits
 
-The following illustrates the structure of an optimization result. Actual reductions depend on the input circuit.
+RQM sits between circuit creation and hardware execution:
 
-!!! note "Example structure"
-    This is representative of the response format. Use `GET /v1/circuits/example` and `POST /v1/circuits/optimize` on the live API to see real results.
+```
+user circuit  →  RQM optimize  →  RQM execute  →  backend (IBM / AWS)
+```
 
-| Metric | Input | Output |
-|---|---|---|
-| Gate count | 12 | 7 |
-| Depth | 8 | 5 |
-| Structure | raw gate sequence | SU(2) canonical form |
+RQM does not own hardware. It enhances Qiskit and Braket by providing a geometry-aware optimization layer before execution.
 
 ---
 
@@ -73,9 +151,29 @@ The following illustrates the structure of an optimization result. Actual reduct
 
 - **Quantum developers** evaluating circuit optimization tooling
 - **Researchers** wanting geometry-correct, reproducible optimization
-- **SDK users** working with Qiskit, Braket, or PennyLane circuits
-- **Internal tooling teams** integrating optimization into a build pipeline
-- **Evaluators** — labs, government programs, and enterprise teams assessing quantum middleware
+- **Labs and government evaluators** assessing quantum middleware
+- **Companies building quantum pipelines** that need optimization before execution
+
+---
+
+## What RQM Is NOT
+
+- **Not a hardware provider** — RQM does not own or operate quantum hardware
+- **Not a simulator vendor** — RQM delegates simulation to Qiskit and Braket
+- **Not replacing Qiskit or Braket** — RQM enhances those systems with geometry-aware optimization
+- **Not a visualization tool** — the optimization and execution pipeline is the core product; visualization is secondary
+
+---
+
+## Future Roadmap
+
+Planned capabilities:
+
+- Backend-aware optimization (topology-informed gate scheduling)
+- Asynchronous optimization jobs
+- Batch circuit execution
+- Hardware topology support
+- Performance benchmarks and reproducibility reports
 
 ---
 
@@ -86,21 +184,6 @@ The following illustrates the structure of an optimization result. Actual reduct
 This is a Swagger placeholder. The `instructions` field must be a list of structured gate objects, not plain strings.
 
 **Fix:** Use `GET /v1/circuits/example` to get a valid payload, then submit that to `POST /v1/circuits/optimize`.
-
----
-
-## Platform Overview
-
-The Optimization API is the primary entry point to the RQM platform. The underlying stack:
-
-| Layer | Package | Responsibility |
-|---|---|---|
-| API | [`rqm-api`](https://github.com/RQM-Technologies-dev/rqm-api) | HTTP service: circuit intake, optimization, results |
-| Compiler | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) | Gate normalization and `u1q` canonical IR |
-| Optimizer | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) | SU(2)-aware gate fusion and compression |
-| Foundation | [`rqm-core`](https://github.com/RQM-Technologies-dev/rqm-core) | Quaternion math, spinors, Bloch vectors |
-
-For architecture details and theory, see [Concepts](concepts.md) and [Ecosystem](ecosystem.md).
 
 ---
 

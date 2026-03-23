@@ -1,6 +1,8 @@
 # The RQM Ecosystem
 
-RQM is a compiler-first quantum software platform built from focused, composable packages. Each package has a distinct responsibility in the stack. They are designed to work together without duplicating logic across boundaries.
+RQM is an optimization-first quantum execution platform built from focused, composable packages. Each package has a distinct responsibility in the stack. They are designed to work together without duplicating logic across boundaries.
+
+RQM sits between circuit creation and hardware execution, providing a geometry-aware optimization and execution pipeline that works with both IBM Qiskit and Amazon Braket.
 
 ---
 
@@ -103,12 +105,30 @@ See the [Optimization guide](optimization.md) for details and usage examples.
 
 ---
 
+## UI
+
+### `rqm-studio` — Visual Interface
+
+RQM Studio is the UI layer on top of `rqm-api`. It provides a visual interface for circuit optimization, execution preparation, and result inspection.
+
+- **Integrates with `rqm-api`** — every Studio action corresponds to an API call
+- **Supports optimization workflows** — upload, optimize, inspect, and compare circuits
+- **Execution UI** — configure and submit circuits to Qiskit or Braket backends; display results
+- **Execution UI is enabled as backend support evolves**
+
+---
+
 ## Architecture Diagram
 
 How data flows through the stack:
 
 ```
 ┌───────────────────────────────────────────────────────────────────┐
+│                          UI Layer                                 │
+│                        rqm-studio                                 │
+└────────────────────────┬──────────────────────────────────────────┘
+                         │
+┌────────────────────────▼──────────────────────────────────────────┐
 │                         User Layer                                │
 │                  rqm-api          rqm-circuits                    │
 └────────────────────────┬──────────────────────────────────────────┘
@@ -153,13 +173,14 @@ rqm-qiskit          rqm-braket          rqm-pennylane
 | Goal | Where to go |
 |---|---|
 | Build a circuit | [`rqm-circuits`](https://github.com/RQM-Technologies-dev/rqm-circuits) + [Circuits API](api/rqm-circuits-api.md) |
-| Run a circuit | [`rqm-api`](https://github.com/RQM-Technologies-dev/rqm-api) + [API guide](api/rqm-api-api.md) |
+| Optimize a circuit | [`rqm-api`](https://github.com/RQM-Technologies-dev/rqm-api) + [API Quickstart](api/quickstart.md) |
+| Execute on Qiskit | [`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) + [Execution reference](api/execution.md) |
+| Execute on Braket | [`rqm-braket`](https://github.com/RQM-Technologies-dev/rqm-braket) + [Execution reference](api/execution.md) |
+| Use the visual UI | [RQM Studio](https://rqmtechnologies.com) + [Studio docs](applications/index.md) |
 | Understand the compiler | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) + [Architecture](architecture.md) |
 | Understand the math | [`rqm-core`](https://github.com/RQM-Technologies-dev/rqm-core) + [Concepts](concepts.md) |
-| Run on Qiskit | [`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) + [Backends overview](api/backends.md) |
-| Run on Braket | [`rqm-braket`](https://github.com/RQM-Technologies-dev/rqm-braket) + [Backends overview](api/backends.md) |
 | Run on PennyLane | [`rqm-pennylane`](https://github.com/RQM-Technologies-dev/rqm-pennylane) + [Backends overview](api/backends.md) |
-| Optimize circuits | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) + [Optimization guide](optimization.md) |
+| Optimize circuits (SDK) | [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) + [Optimization guide](optimization.md) |
 | Learn interactively | [`rqm-notebooks`](https://github.com/RQM-Technologies-dev/rqm-notebooks) + [Notebooks guide](notebooks.md) |
 | Read architecture rationale | [Architecture page](architecture.md) |
 | Install packages | [Installation guide](installation.md) |
