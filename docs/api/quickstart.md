@@ -1,6 +1,6 @@
 # API Quickstart
 
-Get your first optimized circuit in under 30 seconds.
+Get your first optimized and executed circuit in under 30 seconds.
 
 **Base URL:** `https://rqm-api.onrender.com`
 
@@ -16,6 +16,10 @@ Get your first optimized circuit in under 30 seconds.
 | `/v1/circuits/example` | `GET` | Fetch a ready-to-use example circuit |
 | `/v1/circuits/validate` | `POST` | Validate a circuit payload |
 | `/v1/circuits/analyze` | `POST` | Analyze a circuit without optimizing |
+| `/v1/execute/qiskit` | `POST` | Execute on IBM Qiskit |
+| `/v1/execute/braket` | `POST` | Execute on Amazon Braket |
+| `/v1/execute/braket/devices` | `GET` | List available Braket devices |
+| `/v1/execute/braket/{job_id}` | `GET` | Retrieve async Braket job result |
 
 ---
 
@@ -25,7 +29,7 @@ Get your first optimized circuit in under 30 seconds.
 curl https://rqm-api.onrender.com/v1/circuits/example
 ```
 
-Copy the returned JSON. It is a valid input for the `/optimize` endpoint.
+Copy the returned JSON. It is a valid input for the `/optimize` and execution endpoints.
 
 ---
 
@@ -65,6 +69,30 @@ The response is structured as:
 ```
 
 Refer to the [Swagger UI](https://rqm-api.onrender.com/docs) for the current response schema.
+
+---
+
+## Step 4 — Execute (optional)
+
+Send the optimized circuit to a backend:
+
+=== "Qiskit"
+
+    ```bash
+    curl -X POST https://rqm-api.onrender.com/v1/execute/qiskit \
+      -H "Content-Type: application/json" \
+      -d @optimized.json
+    ```
+
+=== "Braket"
+
+    ```bash
+    curl -X POST https://rqm-api.onrender.com/v1/execute/braket \
+      -H "Content-Type: application/json" \
+      -d @optimized.json
+    ```
+
+For full execution options, see the [Execution reference](execution.md).
 
 ---
 
@@ -108,6 +136,7 @@ This is the default Swagger placeholder. The `instructions` field must contain s
 |---|---|
 | Full API schema | [Swagger UI](https://rqm-api.onrender.com/docs) |
 | API reference overview | [rqm-api docs](rqm-api-api.md) |
+| Execution endpoints | [Execution reference](execution.md) |
 | Platform architecture | [Ecosystem](../ecosystem.md) |
 | Theory and deep dives | [Concepts](../concepts.md) |
 | Python SDK quickstart | [SDK Quickstart](../quickstart.md) |
