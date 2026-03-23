@@ -18,7 +18,7 @@
 \author{\IEEEauthorblockN{John Van Geem}
 \IEEEauthorblockA{\textit{CEO, RQM Technologies}\\
 Arlington, VA, USA\\
-0009-0002-4003-8452}
+ORCID: 0009-0002-4003-8452}
 }
 
 \maketitle
@@ -58,7 +58,7 @@ physics.
 The central problem is that current compilers reason about single-qubit operations at the
 level of \textit{named gate syntax}. A rotation by angle $\theta$ about the $Z$-axis can
 appear as \texttt{rz}$(\theta)$, \texttt{p}$(\theta)$, \texttt{u1}$(\theta)$, or a phase
-gate --- all semantically identical but syntactically distinct. A compiler that operates
+gate: all are semantically identical but syntactically distinct. A compiler that operates
 over gate names must maintain a growing equivalence table: adding a new gate alias requires
 updating the table, and supporting a new backend requires translating each named gate
 individually. Complexity scales with the number of gate aliases, not with the mathematical
@@ -94,7 +94,7 @@ multiplication faithfully reproduces the composition law of single-qubit unitary
 The central contribution of this paper is a quaternion-based IR, which we call \textbf{u1q},
 serving as a \textit{semantic normalization boundary} for single-qubit optimization. By
 establishing this boundary before any optimization pass runs, the compiler guarantees that
-all single-qubit gates --- from any framework, in any parameterization --- arrive at the
+all single-qubit gates, from any framework and in any parameterization, arrive at the
 optimizer in an identical canonical form. We describe the mathematical structure of this
 representation, define its invariants, and argue concretely why it enables cleaner gate
 fusion, identity elimination, and backend-agnostic lowering than syntax-level pipelines
@@ -108,8 +108,8 @@ approach.
 \subsection{The Gate-Alias Problem}
 
 Modern quantum frameworks each define their own named gate vocabularies. Qiskit, Amazon
-Braket, and PennyLane express the same physical operation --- a phase shift, a
-parameterized rotation, a Hadamard --- using different instruction names and parameter
+Braket, and PennyLane express the same physical operation (a phase shift, a
+parameterized rotation, or a Hadamard) using different instruction names and parameter
 conventions. Even within a single framework, gate names alias one another: Qiskit's
 \texttt{rz}, \texttt{p}, and \texttt{u1} all implement a $Z$-axis rotation with different
 historical names, different default parameter interpretations in older API versions, and
@@ -165,8 +165,8 @@ holds between two circuit representations that use the same gate names and param
 \textit{Semantic equivalence} holds between two circuit representations that compute the
 same physical unitary, regardless of how they are written. A compiler operating at the
 syntax level can only detect syntactic equivalences that its rewrite rules explicitly
-anticipate. Two circuits that are semantically equivalent --- because they represent the
-same sequence of physical rotations --- may be syntactically distinct in a way the
+anticipate. Two circuits that are semantically equivalent, because they represent the
+same sequence of physical rotations, may be syntactically distinct in a way the
 compiler has no rule to recognize.
 
 This gap between syntactic and semantic equivalence is not merely theoretical. It arises
@@ -184,14 +184,14 @@ level.
 The foregoing observations converge on a single architectural critique: syntax-oriented
 quantum compilers produce brittle optimization logic. By ``brittle'' we mean that the
 correctness and completeness of the optimizer depend on properties of the input
-representation --- specifically, on which gate names were used and whether they are
-covered by the alias table --- rather than on the mathematical content of the circuit.
+representation, specifically on which gate names were used and whether they are
+covered by the alias table, rather than on the mathematical content of the circuit.
 Two circuits that are physically identical may be optimized differently, or not at all,
 simply because they were written using different names. A compiler with this property
 cannot offer uniform guarantees across frameworks, and it requires non-trivial engineering
 effort to extend to new backends or gate sets.
 
-The natural remedy is to move the optimization boundary below the syntactic level --- to
+The natural remedy is to move the optimization boundary below the syntactic level, to
 a representation that encodes gate semantics directly. The quaternion IR proposed in this
 paper is such a representation. It eliminates gate aliases by construction, makes
 semantic equivalence structurally visible, and supports a uniform set of optimization
@@ -203,7 +203,7 @@ rules that apply to all single-qubit gates simultaneously.
 
 \subsection{Mathematical Foundation}
 
-A single-qubit gate is a $2{\times}2$ complex unitary matrix with determinant 1 --- an
+A single-qubit gate is a $2{\times}2$ complex unitary matrix with determinant 1, and thus an
 element of the special unitary group SU(2). The group SU(2) has a well-known geometric
 interpretation: it is isomorphic to the unit 3-sphere $S^3$ in four-dimensional Euclidean
 space, meaning that every single-qubit rotation corresponds to a unique point on $S^3$
@@ -240,8 +240,8 @@ U(q) =
 \label{eq:su2matrix}
 \end{equation}
 This correspondence is an algebraic isomorphism, not a coordinate approximation.
-Every arithmetic operation on quaternions --- multiplication, conjugation, norm
-computation --- has a direct counterpart in SU(2) matrix algebra. Quaternion
+Every arithmetic operation on quaternions, including multiplication, conjugation, and norm
+computation, has a direct counterpart in SU(2) matrix algebra. Quaternion
 multiplication corresponds exactly to matrix multiplication, and the conjugate $q^*$
 corresponds exactly to the matrix adjoint $U^\dagger$. A compiler that works with
 quaternions is therefore working with the exact mathematical structure of the gates,
@@ -266,14 +266,14 @@ Three properties of unit quaternions make them particularly well suited as a com
 for single-qubit gates.
 
 First, \textit{closure under composition}: the product of two unit quaternions is again a
-unit quaternion. This means that gate fusion --- the composition of two single-qubit
-operations --- never leaves the representation space. There is no intermediate form, no
+unit quaternion. This means that gate fusion, the composition of two single-qubit
+operations, never leaves the representation space. There is no intermediate form, no
 normalization step between operations, and no risk of accumulating a non-canonical
 intermediate. Sequential single-qubit gates can be fused into a single quaternion by a
 sequence of multiplications, and the result is immediately in the canonical representation.
 
 Second, \textit{compactness}: a unit quaternion requires exactly four real numbers subject
-to one quadratic constraint, for an effective dimension of three --- matching the three
+to one quadratic constraint, for an effective dimension of three, matching the three
 degrees of freedom of SU(2). The full $2\times2$ complex matrix representation uses eight
 real numbers (or four complex) subject to four constraints. The quaternion form is not just
 more convenient computationally; it is the minimal-redundancy representation of the gate's
@@ -284,8 +284,8 @@ that introduces approximation error. The isomorphism between unit quaternions an
 exact, and quaternion arithmetic is exact subject only to floating-point precision. Gate
 composition using quaternion multiplication preserves the same precision as matrix
 multiplication and does not accumulate additional approximation. For compiler verification
-purposes --- confirming that an optimized circuit computes the same unitary as the
-original --- the quaternion form supports exact norm checks and equality tests with
+purposes of confirming that an optimized circuit computes the same unitary as the
+original, the quaternion form supports exact norm checks and equality tests with
 well-defined numerical tolerances.
 
 \subsection{IR Definition and Invariants}
@@ -311,7 +311,7 @@ Canonical sign & $w \geq 0$ (geodesic shortest arc) \\
 
 The unit-norm constraint enforces that the quaternion lies on $S^3$, corresponding to a
 valid SU(2) element. The non-degeneracy constraint rules out the zero quaternion, which
-has no geometric interpretation. The canonical-sign constraint --- $w \geq 0$ --- resolves
+has no geometric interpretation. The canonical-sign constraint, $w \geq 0$, resolves
 the SU(2) double-cover ambiguity: both $q$ and $-q$ represent the same physical rotation,
 so the IR must select exactly one representative. The convention $w \geq 0$ places the
 representative in the upper hemisphere of $S^3$, corresponding to the rotation arc of
@@ -319,8 +319,8 @@ length at most $\pi$ (the physically shorter rotation), and matches standard con
 in quaternion interpolation literature.
 
 Together, these invariants define a unique canonical form for every single-qubit unitary.
-Any two gates that compute the same physical rotation --- regardless of their original
-names, frameworks, or parameter conventions --- will produce the same u1q quaternion after
+Any two gates that compute the same physical rotation, regardless of their original
+names, frameworks, or parameter conventions, will produce the same u1q quaternion after
 canonicalization. This is the semantic normalization property that makes the IR valuable
 as an optimization boundary.
 
@@ -328,8 +328,8 @@ as an optimization boundary.
 
 Table~\ref{tab:gatemapping} gives the canonical quaternion coordinates for a representative
 set of standard single-qubit gates, derived from \eqref{eq:axisangle} with the $w \geq 0$
-sign convention. The table illustrates how diverse gate types --- discrete Clifford gates,
-parameterized rotations, and multi-angle gates --- all map into the same four-component form.
+sign convention. The table illustrates how diverse gate types, including discrete Clifford gates,
+parameterized rotations, and multi-angle gates, all map into the same four-component form.
 
 \begin{table*}[htbp]
 \renewcommand{\arraystretch}{1.35}
@@ -386,16 +386,15 @@ two-qubit operations, and the compiler can proceed with optimization at the sema
 \section{Why Quaternion-Based IR Is an Upgrade}
 %% ============================================================
 
-This section is the argumentative center of the paper. Each advantage described here
-is structural, following from the algebraic isomorphism between unit quaternions and
-SU(2), not from heuristic engineering decisions. Taken together, they support the
-claim that the quaternion IR is not simply an alternative encoding but a better
-optimization boundary.
+Each advantage described in this section is structural, following from the algebraic
+isomorphism between unit quaternions and SU(2), not from heuristic engineering decisions.
+Taken together, these advantages support the claim that the quaternion IR is not simply
+an alternative encoding but a fundamentally better optimization boundary.
 
 \subsection{Canonical Semantic Normalization}
 
-After \texttt{to\_u1q\_pass}, every single-qubit gate --- regardless of its original name,
-framework, or parameter convention --- has been mapped to a single canonical form. Two
+After \texttt{to\_u1q\_pass}, every single-qubit gate, regardless of its original name,
+framework, or parameter convention, has been mapped to a single canonical form. Two
 gates that are physically identical produce the same quaternion. This is a stronger
 guarantee than any alias table can provide, because it is grounded in the mathematical
 structure of SU(2) rather than in a manually maintained enumeration.
@@ -412,13 +411,13 @@ the names assigned to them in a given framework.
 
 Name-based compilers must explicitly handle each alias pair: (\texttt{rz}, \texttt{p}),
 (\texttt{p}, \texttt{u1}), (\texttt{u1}, \texttt{phaseshift}), and so on. The quaternion
-IR eliminates this entirely. Once all gates are in u1q form, there are no aliases ---
+IR eliminates this entirely. Once all gates are in u1q form, there are no aliases,
 only quaternions. Every optimization pass that operates over u1q automatically covers the
 complete space of single-qubit operations, without any awareness of the gate names that
 appeared in the input.
 
 This has a concrete engineering consequence. When a new framework introduces a new gate
-alias --- say, a \texttt{phase\_shift} gate that is physically identical to \texttt{rz} ---
+alias (say, a \texttt{phase\_shift} gate that is physically identical to \texttt{rz}),
 a name-based compiler must be extended to recognize the new alias in every optimization
 pass that might benefit from it. A quaternion IR compiler requires only one update: the
 gate resolution step that maps the new gate name to its quaternion coordinates. All
@@ -609,8 +608,8 @@ pass, the IR is fully in canonical u1q form and ready for optimization.
 
 Quaternion fusion collapses consecutive u1q gates on the same qubit via
 \eqref{eq:fusion}, re-canonicalizing after each multiplication to maintain the $w \geq 0$
-invariant. Fusion traverses each qubit's single-qubit segment --- the maximal sequence
-of single-qubit operations between consecutive two-qubit gate boundaries --- and reduces
+invariant. Fusion traverses each qubit's single-qubit segment, the maximal sequence
+of single-qubit operations between consecutive two-qubit gate boundaries, and reduces
 it to a single quaternion. The fused quaternion represents the exact composition of all
 single-qubit operations in that segment. If the segment contains $n$ gates, the fused
 result is computed in $n-1$ quaternion multiplications, each a constant-time operation.
@@ -628,7 +627,7 @@ implements a common interface contract that accepts a u1q quaternion and returns
 of backend-native gates. Because all optimization has already been applied at the u1q level,
 the backend adapter's output is already as short as the optimizer can make it.
 
-The pipeline is realized as a Python library and REST API, providing a reproducible
+The pipeline is realized as a Python library, providing a reproducible
 optimization service for evaluation purposes. The same input circuit yields the same
 optimized output on every invocation, because the pipeline is determined entirely by
 quaternion arithmetic and contains no non-deterministic passes. This reproducibility is
@@ -662,6 +661,7 @@ are available.
 \begin{table}[htbp]
 \caption{Benchmark Results Summary}
 \begin{center}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{p{2.2cm}ccccccc}
 \toprule
 \textbf{Circuit} & \textbf{Qb} &
@@ -673,7 +673,8 @@ Rx${\cdot}$Rx seq.           & 1 & 2 & 1 &  50\% & 2 & 1 & \checkmark \\
 Bell prep                    & 2 & 3 & 3 &   0\% & 2 & 2 & \checkmark \\
 \bottomrule
 \multicolumn{8}{l}{\footnotesize Qb = qubits; G = gate count; D = depth; Eq. = semantic equivalence.}
-\end{tabular}
+\end{tabular}%
+}
 \label{tab:results}
 \end{center}
 \end{table}
@@ -694,8 +695,8 @@ These properties are not established by benchmark numbers alone; they are conseq
 of the algebraic structure of SU(2) and the isomorphism with unit quaternions. The
 benchmark results provide evidence that the implementation correctly realizes the IR
 concept and that the optimization passes function as intended. Broader quantitative
-evaluation --- covering variational circuits, Clifford circuits, and application-scale
-benchmarks --- is ongoing and will form the basis of a subsequent evaluation study.
+evaluation, covering variational circuits, Clifford circuits, and application-scale
+benchmarks, is ongoing and will form the basis of a subsequent evaluation study.
 
 %% ============================================================
 \section{Related Work}
@@ -751,16 +752,16 @@ ZX-based Clifford simplification second.
 
 Quaternions have appeared in quantum computing contexts primarily for state visualization
 (representing Bloch sphere rotations) and for robotics-inspired gate decomposition
-algorithms. Their use as a \textit{compiler IR} --- as an algebraic normalization layer
-through which all optimization passes are defined --- is, to our knowledge, not
+algorithms. Their use as a \textit{compiler IR}, specifically as an algebraic normalization
+layer through which all optimization passes are defined, is, to our knowledge, not
 established in prior work. The nearest prior use is in parameterized circuit optimization
 where trigonometric identities are applied to simplify rotation angles; this shares the
 goal of reasoning about rotations mathematically, but does not establish a canonical
 IR form or use quaternion multiplication as the core fusion mechanism. The contribution
 here is not the use of quaternions per se, but the engineering decision to make the
 quaternion form the primary representation at the optimization boundary, and to build
-a complete optimization pipeline --- with defined invariants, pass structure, and
-backend interface contract --- on top of it.
+a complete optimization pipeline, with defined invariants, pass structure, and
+backend interface contract, on top of it.
 
 %% ============================================================
 \section{Limitations and Conclusion}
@@ -794,9 +795,9 @@ behave differently from the benchmarks reported. A more comprehensive evaluation
 comparison against fully optimized Qiskit transpiler pipelines, is deferred to future work
 and requires a broader benchmark suite.
 
-Several planned extensions --- commutation-aware pass ordering, peephole optimization
-over longer gate sequences, and hardware-native shortest-path decomposition --- are not
-yet implemented. These extensions would strengthen the optimizer's ability to find
+Several planned extensions, including commutation-aware pass ordering, peephole
+optimization over longer gate sequences, and hardware-native shortest-path decomposition,
+are not yet implemented. These extensions would strengthen the optimizer's ability to find
 reduction opportunities in more complex circuits, but their absence does not affect the
 validity of the core claim: that the quaternion IR provides a better optimization boundary
 than named-gate representations for the passes that are implemented.
