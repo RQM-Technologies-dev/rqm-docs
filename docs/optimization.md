@@ -1,74 +1,67 @@
-# rqm-optimize
+# Optimization
 
-`rqm-optimize` is the optimization layer of the RQM platform. It sits above the execution backends and applies SU(2)-aware circuit transformations to reduce gate count, circuit depth, and backend resource usage — before the circuit is submitted to a simulator or hardware device.
-
----
-
-## What It Does
-
-`rqm-optimize` accepts a compiled quantum circuit (produced by `rqm-compiler` and translated to a backend format by `rqm-qiskit` or `rqm-braket`) and applies a sequence of geometry-aware optimization passes:
-
-- **SU(2) gate fusion** — merges consecutive single-qubit rotations into a single SU(2) operation using exact quaternion composition
-- **Redundancy elimination** — detects and removes gate pairs that compose to the identity
-- **Depth reduction** — reorders commuting operations to minimize circuit depth without changing the program semantics
-- **Compression** — collapses equivalent gate sequences into canonical forms defined by `rqm-core`
-
-All passes are geometry-aware: they use the quaternion and SU(2) primitives from `rqm-core` to reason about gate equivalence exactly, not approximately.
+Optimization in the current RQM stack is owned by `rqm-compiler` and should be understood as an **internal, verified rewriting pipeline** that begins after the public `rqm-circuits` boundary.
 
 ---
 
-## When to Use It
+## The current pipeline
 
-Use `rqm-optimize` when:
+The public semantics exposed by the current stack include these stages:
 
-- You want to reduce the number of gates before submitting to hardware (fewer gates → less decoherence)
-- You are running on a backend with a limited native gate set and want to minimize transpilation overhead
-- You have long circuits with repeated rotation patterns that can be fused
-- You want reproducible, geometry-correct optimization rather than heuristic transpilation
+1. `normalize`
+2. `canonicalize`
+3. `flatten`
+4. `to_u1q`
+5. `merge_u1q`
+6. `sign_canon`
+7. `cancel_2q`
 
-`rqm-optimize` is optional. If you are running on a simulator and circuit depth is not a concern, you can skip it. For hardware runs, it is recommended.
-
----
-
-## Example
-
-```python
-from rqm_compiler import compile_circuit
-from rqm_qiskit import compiled_circuit_to_qiskit
-from rqm_optimize import optimize
-
-# Step 1: compile the program to a backend-agnostic IR
-qc = compile_circuit(program)
-
-# Step 2: translate to a Qiskit circuit
-qc = compiled_circuit_to_qiskit(qc)
-
-# Step 3: apply SU(2)-aware optimization
-qc = optimize(qc)
-
-# Step 4: run on a backend as usual
-result = backend.run(qc)
-```
-
-The `optimize()` call is a drop-in step. It accepts and returns the same circuit type, so it can be inserted into any existing workflow without restructuring the pipeline.
+This pipeline does not blur public wire format with internal optimization IR. Public callers submit `rqm-circuits`; the compiler runs the internal passes.
 
 ---
 
-## Position in the Stack
+## What the passes are doing
 
-`rqm-optimize` operates after compilation and translation, and before execution:
+### Normalization and canonicalization
+These early stages clean up representation and prepare the circuit for reliable internal reasoning.
 
-```
-rqm-core       → canonical math (quaternions, spinors, SU(2))
-rqm-compiler   → circuit construction and IR lowering
-rqm-qiskit     → execution bridge (Qiskit)
-rqm-braket     → execution bridge (AWS Braket)
-rqm-optimize   → optimization layer (SU(2)-aware gate fusion and compression)
-```
+### Lowering to canonical internal IR
+`to_u1q` lowers named single-qubit gates into the canonical internal 1Q form `u1q`.
 
-It depends on `rqm-core` for geometry primitives and operates on circuits already in a backend format. It does not re-enter the compiler pipeline.
+### Merge and cancel stages
+`merge_u1q` combines compatible single-qubit structure after lowering. `cancel_2q` removes eligible two-qubit redundancy where verification supports doing so. `sign_canon` keeps sign conventions canonical so equivalent forms compare cleanly.
 
 ---
 
-!!! tip "Optimization is geometry-correct"
-    Unlike heuristic transpilers, `rqm-optimize` uses exact SU(2) arithmetic from `rqm-core` to determine gate equivalences. Two gates are fused only when their quaternion product is provably correct — never based on floating-point approximation alone.
+## Trust semantics
+
+Optimization is **proof-gated and fail-closed**.
+
+That means:
+
+- the compiler may build an optimized candidate internally
+- the candidate is verified before commit
+- only verified candidates become the returned optimized circuit
+- if verification is unsupported, fails, or is not established, the original circuit is returned unchanged
+
+This is the most important thing to preserve when describing RQM optimization. It is not an opportunistic best-effort rewrite surface.
+
+---
+
+## Profiles in the API
+
+`POST /v1/circuits/optimize` accepts:
+
+- `safe`
+- `balanced` (default)
+- `aggressive`
+
+The docs should stay honest here: some current profile behavior may be equivalent or reserved in the present release. Clients can still use the stable request contract without assuming that every profile produces a distinct optimization regime today.
+
+---
+
+## Backend hints are not backend lowering
+
+The optimize endpoint also accepts backend hints such as `generic`, `qiskit`, and `braket`.
+
+Those hints should not be confused with the explicit backend-targeted lowering stage. In RQM's architecture, canonical optimization happens first; later lowering is separate and explicit.

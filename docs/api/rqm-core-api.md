@@ -1,147 +1,63 @@
-# rqm-core API Guide
+# `rqm-core`
 
-`rqm-core` is the canonical math engine for the RQM ecosystem. This page provides an overview of its primary modules and key functions. It is an API guide, not auto-generated reference documentation — full generated docs will be added in a future release.
+`rqm-core` is the **mathematical spine** of the RQM stack.
 
----
-
-## Modules
-
-`rqm-core` is organized into three primary modules:
-
-| Module | Responsibility |
-|---|---|
-| `rqm_core.spinor` | Spinor normalization, manipulation, and inter-format conversion |
-| `rqm_core.bloch` | Bloch vector computation and visualization utilities |
-| `rqm_core.su2` | SU(2) matrix construction and quaternion-group operations |
+It owns the shared primitives that other layers depend on: quaternion algebra, spinors, SU(2), Bloch/state mappings, validation, linear algebra, and the coupling / preservation analysis surfaces that support optimization trust.
 
 ---
 
-## `rqm_core.spinor`
+## What `rqm-core` owns now
 
-### `normalize_spinor`
+- quaternion primitives and conversions
+- spinor helpers and normalization
+- SU(2) construction and validation
+- Bloch/state mappings
+- shared validation and linear algebra helpers
+- coupling / entanglement analysis primitives
+- optimization-preservation analysis support
 
-Normalizes a two-component complex spinor to unit magnitude.
-
-```python
-from rqm_core.spinor import normalize_spinor
-
-psi = [0.6, 0.8]
-psi_norm = normalize_spinor(psi)
-# |psi_norm[0]|² + |psi_norm[1]|² == 1.0
-```
-
-**Parameters**: `psi` — array-like of shape `(2,)`, complex or real.  
-**Returns**: Normalized spinor as a NumPy array.
+This is broader than a generic math utility package. It is the substrate used by both the compiler and analysis layers.
 
 ---
 
-### `spinor_to_quaternion`
+## Coupling-analysis support
 
-Converts a normalized spinor to a unit quaternion representation.
+One of the important current changes is that `rqm-core` now includes coupling / entanglement analysis primitives.
 
-```python
-from rqm_core.spinor import spinor_to_quaternion
+The docs should describe this honestly:
 
-psi = [1.0, 0.0]
-q = spinor_to_quaternion(psi)
-# q is a quaternion [w, x, y, z] with |q| == 1
-```
+- there are **qualitative** and **measured** analysis modes
+- measured scope is limited
+- unsupported cases should not be described as unrestricted measured entanglement analysis
 
-**Parameters**: `psi` — normalized spinor of shape `(2,)`.  
-**Returns**: Quaternion as a NumPy array `[w, x, y, z]`.
+This same analysis support also underpins preservation-oriented checks used in optimization trust workflows.
 
 ---
 
-### Additional Spinor Utilities
+## Why this matters to the rest of the stack
 
-| Function | Description |
-|---|---|
-| `spinor_inner_product(psi1, psi2)` | Compute the inner product `⟨ψ₁&#124;ψ₂⟩` |
-| `spinor_overlap(psi1, psi2)` | Compute the probability overlap `&#124;⟨ψ₁&#124;ψ₂⟩&#124;²` |
-| `random_spinor()` | Generate a uniformly random normalized spinor |
+- `rqm-compiler` depends on `rqm-core` for canonical mathematical meaning
+- `rqm-api` exposes coupling-analysis endpoints built on these primitives
+- Studio can surface analysis and preservation signals without re-implementing the math
 
 ---
 
-## `rqm_core.bloch`
+## Boundary language
 
-### `state_to_bloch`
+`rqm-core` does **not** own:
 
-Converts a normalized spinor to its Bloch vector `(x, y, z)`.
+- the public circuit schema
+- compiler rewrites or optimization policy
+- API service boundaries
+- Studio workflow state
+- provider execution logic
 
-```python
-from rqm_core.bloch import state_to_bloch
-
-psi = [1.0, 0.0]           # |0⟩
-bloch = state_to_bloch(psi)
-# bloch == [0.0, 0.0, 1.0]  (north pole)
-```
-
-**Parameters**: `psi` — normalized spinor of shape `(2,)`.  
-**Returns**: Bloch vector as a NumPy array `[x, y, z]`, with `|n| == 1`.
+Those live in higher layers.
 
 ---
 
-### Additional Bloch Utilities
+## Next pages
 
-| Function | Description |
-|---|---|
-| `bloch_to_spinor(bloch)` | Invert `state_to_bloch`; returns a canonical spinor |
-| `bloch_angle_between(b1, b2)` | Angular distance between two Bloch vectors (radians) |
-
----
-
-## `rqm_core.su2`
-
-### `quaternion_to_su2`
-
-Constructs the 2×2 SU(2) matrix corresponding to a unit quaternion.
-
-```python
-from rqm_core.su2 import quaternion_to_su2
-
-q = [1.0, 0.0, 0.0, 0.0]  # identity quaternion
-U = quaternion_to_su2(q)
-# U == [[1+0j, 0+0j], [0+0j, 1+0j]]
-```
-
-**Parameters**: `q` — unit quaternion `[w, x, y, z]`.  
-**Returns**: 2×2 complex NumPy array.
-
----
-
-### Additional SU(2) Utilities
-
-| Function | Description |
-|---|---|
-| `su2_to_quaternion(U)` | Extract the quaternion from an SU(2) matrix |
-| `su2_compose(U1, U2)` | Compose two SU(2) rotations (equivalent to matrix multiplication) |
-| `su2_rotation(axis, angle)` | Construct an SU(2) element from axis and rotation angle |
-
----
-
-## Usage Example
-
-```python
-import numpy as np
-from rqm_core.spinor import normalize_spinor, spinor_to_quaternion
-from rqm_core.bloch import state_to_bloch
-from rqm_core.su2 import quaternion_to_su2
-
-# Define a state
-psi_raw = [1.0, 1.0j]
-psi = normalize_spinor(psi_raw)
-
-# Convert to Bloch vector
-bloch = state_to_bloch(psi)
-print("Bloch vector:", bloch)
-
-# Convert to quaternion and then to SU(2)
-q = spinor_to_quaternion(psi)
-U = quaternion_to_su2(q)
-print("SU(2) matrix:\n", U)
-```
-
----
-
-!!! note "Full API Reference"
-    Auto-generated API documentation with full signatures, type annotations, and docstrings is planned for a future release. In the meantime, refer to the source code in the [`rqm-core` repository](https://github.com/RQM-Technologies-dev/rqm-core).
+- [Coupling Analysis](coupling-analysis.md)
+- [Architecture](../architecture.md)
+- [Optimization](../optimization.md)

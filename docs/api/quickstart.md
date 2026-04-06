@@ -1,106 +1,41 @@
 # API Quickstart
 
-Get your first optimized and executed circuit in under 30 seconds.
+A concise path through the current `rqm-api` surface using the live service boundary.
 
 **Base URL:** `https://rqm-api.onrender.com`
 
-[:material-book-open-variant: Open Swagger UI](https://rqm-api.onrender.com/docs){ .md-button .md-button--primary }
+[:material-book-open-variant: Swagger UI](https://rqm-api.onrender.com/docs){ .md-button .md-button--primary }
+[:material-file-tree: API Overview](rqm-api-api.md){ .md-button }
 
 ---
 
-## Endpoints Overview
+## 1. Get example circuits
 
-| Endpoint | Method | Purpose |
-|---|---|---|
-| `/v1/circuits/optimize` | `POST` | **Primary** — optimize a circuit |
-| `/v1/circuits/example` | `GET` | Fetch a ready-to-use example circuit |
-| `/v1/circuits/validate` | `POST` | Validate a circuit payload |
-| `/v1/circuits/analyze` | `POST` | Analyze a circuit without optimizing |
-| `/v1/execute/qiskit` | `POST` | Execute on IBM Qiskit |
-| `/v1/execute/braket` | `POST` | Execute on Amazon Braket |
-| `/v1/execute/braket/devices` | `GET` | List available Braket devices |
-| `/v1/execute/braket/{job_id}` | `GET` | Retrieve async Braket job result |
+The current example endpoint supports named examples:
 
----
+- `bell`
+- `ghz`
+- `optimizable`
 
-## Step 1 — Fetch an example circuit
+Omitting `name` returns all examples.
 
 ```bash
-curl https://rqm-api.onrender.com/v1/circuits/example
+curl "https://rqm-api.onrender.com/v1/circuits/example?name=bell"
 ```
 
-Copy the returned JSON. It is a valid input for the `/optimize` and execution endpoints.
-
----
-
-## Step 2 — Optimize the circuit
-
-Save the example JSON to a file:
+To retrieve the full set:
 
 ```bash
-curl https://rqm-api.onrender.com/v1/circuits/example > example.json
+curl "https://rqm-api.onrender.com/v1/circuits/example"
 ```
 
-Then submit it for optimization:
-
-```bash
-curl -X POST https://rqm-api.onrender.com/v1/circuits/optimize \
-  -H "Content-Type: application/json" \
-  -d @example.json
-```
-
-The response includes the optimized circuit, gate count, depth, and an optimization report.
+The current public wire format is **`rqm-circuits` schema `0.2`**. Legacy `0.1` may still be accepted for compatibility, but `0.2` is the current target.
 
 ---
 
-## Step 3 — Read the result
+## 2. Validate or analyze
 
-The response is structured as:
-
-```json
-{
-  "optimized_circuit": { ... },
-  "gate_count_before": 12,
-  "gate_count_after": 7,
-  "depth_before": 8,
-  "depth_after": 5,
-  "report": { ... }
-}
-```
-
-Refer to the [Swagger UI](https://rqm-api.onrender.com/docs) for the current response schema.
-
----
-
-## Step 4 — Execute (optional)
-
-Send the optimized circuit to a backend:
-
-=== "Qiskit"
-
-    ```bash
-    curl -X POST https://rqm-api.onrender.com/v1/execute/qiskit \
-      -H "Content-Type: application/json" \
-      -d @optimized.json
-    ```
-
-=== "Braket"
-
-    ```bash
-    curl -X POST https://rqm-api.onrender.com/v1/execute/braket \
-      -H "Content-Type: application/json" \
-      -d @optimized.json
-    ```
-
-For full execution options, see the [Execution reference](execution.md).
-
----
-
-## Support Endpoints
-
-### `POST /v1/circuits/validate`
-
-Checks whether a circuit payload is well-formed before submitting for optimization.
+Validate first if you are generating payloads yourself:
 
 ```bash
 curl -X POST https://rqm-api.onrender.com/v1/circuits/validate \
@@ -108,9 +43,7 @@ curl -X POST https://rqm-api.onrender.com/v1/circuits/validate \
   -d @example.json
 ```
 
-### `POST /v1/circuits/analyze`
-
-Returns a structural analysis of the circuit (gate count, depth, gate types) without modifying it.
+Analyze when you want structure and compatibility enrichment without changing the circuit:
 
 ```bash
 curl -X POST https://rqm-api.onrender.com/v1/circuits/analyze \
@@ -118,25 +51,103 @@ curl -X POST https://rqm-api.onrender.com/v1/circuits/analyze \
   -d @example.json
 ```
 
----
-
-## Troubleshooting
-
-**Error: `"instructions": ["string"]`**
-
-This is the default Swagger placeholder. The `instructions` field must contain structured gate objects, not plain strings.
-
-**Fix:** Use `GET /v1/circuits/example` to get a valid payload, then send that to `/optimize`.
+`/v1/circuits/analyze` includes compatibility entanglement enrichment where available.
 
 ---
 
-## Next Steps
+## 3. Optimize with profile and backend hints
 
-| Goal | Where to go |
-|---|---|
-| Full API schema | [Swagger UI](https://rqm-api.onrender.com/docs) |
-| API reference overview | [rqm-api docs](rqm-api-api.md) |
-| Execution endpoints | [Execution reference](execution.md) |
-| Platform architecture | [Ecosystem](../ecosystem.md) |
-| Theory and deep dives | [Concepts](../concepts.md) |
-| Python SDK quickstart | [SDK Quickstart](../quickstart.md) |
+`/v1/circuits/optimize` supports:
+
+- `profile`: `safe`, `balanced` (default), `aggressive`
+- `backend`: `generic`, `qiskit`, `braket`
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/circuits/optimize \
+  -H "Content-Type: application/json" \
+  -d '{
+    "circuit": { ... },
+    "profile": "balanced",
+    "backend": "generic"
+  }'
+```
+
+Documented conservatively: some profile/backend combinations are reserved or equivalent in the current release. Treat the hints as part of a stable request contract, not as a guarantee of materially different output in every case.
+
+---
+
+## 4. Inspect coupling or preservation
+
+Use the coupling surfaces when you need trust signals around entangling structure or before/after preservation:
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/analysis/coupling \
+  -H "Content-Type: application/json" \
+  -d @example.json
+```
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/analysis/coupling/compare \
+  -H "Content-Type: application/json" \
+  -d '{"original": { ... }, "candidate": { ... }}'
+```
+
+Measured analysis is intentionally limited. Outside supported scope, the platform falls back to qualitative signals instead of fabricating measured claims.
+
+---
+
+## 5. Inspect execution capabilities first
+
+Before showing users backend options, inspect readiness:
+
+```bash
+curl https://rqm-api.onrender.com/v1/execute/capabilities
+```
+
+Use this endpoint before offering Qiskit, Braket local, or billed hardware flows in a client or Studio workflow.
+
+---
+
+## 6. Execute
+
+### Qiskit path
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/execute/qiskit \
+  -H "Content-Type: application/json" \
+  -d @optimized.json
+```
+
+### Braket local / managed path
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/execute/braket \
+  -H "Content-Type: application/json" \
+  -d @optimized.json
+```
+
+### Held-job hardware flow
+
+```bash
+curl -X POST https://rqm-api.onrender.com/v1/execute/braket/held/{job_id}
+```
+
+Do not assume universal instant hardware access. Hardware submission depends on provider readiness, credentials, billing state, validation, and any required quote/hold flow.
+
+---
+
+## 7. Authenticated and Pro surfaces
+
+Unauthenticated circuit workflows are only part of the platform surface. Authenticated sessions matter for:
+
+- account identity and diagnostics
+- Pro/account state
+- wallet and billing visibility
+- held-job and hardware-oriented flows
+- dashboard and recovery surfaces
+
+See:
+
+- [Authentication](authentication.md)
+- [Billing & Wallet](billing-and-wallet.md)
+- [Execution Capabilities](execution-capabilities.md)

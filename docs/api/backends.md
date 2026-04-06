@@ -1,149 +1,44 @@
-# Execution Backends
+# Backends
 
-RQM supports multiple execution backends. All backends consume the same `u1q` IR produced by `rqm-compiler`, so the same program runs on any backend without modification.
+RQM is **backend-agnostic at the public circuit boundary** and **explicit about backend targeting later**.
 
----
-
-## Available Backends
-
-| Backend | Package | Runtime |
-|---|---|---|
-| `"qiskit"` | `rqm-qiskit` | Qiskit Aer simulator / IBM hardware |
-| `"braket"` | `rqm-braket` | Amazon Braket local simulator / AWS hardware |
-| `"pennylane"` | `rqm-pennylane` | PennyLane default device / hardware plugins |
+This page documents backend families from the perspective of the current stack, not from the perspective of internal compiler IR.
 
 ---
 
-## Selecting a Backend
+## Current backend families exposed through the API
 
-Pass the backend name string to `rqm_api.run`:
-
-```python
-from rqm_api import run
-
-result = run(qc, backend="qiskit")
-result = run(qc, backend="braket")
-result = run(qc, backend="pennylane")
-```
-
-Or use a backend instance directly:
-
-```python
-from rqm_qiskit import QiskitBackend
-
-backend = QiskitBackend()
-result = run(qc, backend=backend)
-```
-
----
-
-## rqm-qiskit
-
-[`rqm-qiskit`](https://github.com/RQM-Technologies-dev/rqm-qiskit) translates the `u1q` IR into Qiskit circuits and executes them on the Aer simulator or IBM hardware.
-
-**Install:**
-
-```bash
-pip install rqm-qiskit
-```
-
-**Key class:** `QiskitBackend`
-
-```python
-from rqm_qiskit import QiskitBackend
-
-backend = QiskitBackend()
-result = backend.run_local(program)    # local Aer simulator
-result = backend.run_device(program, device="ibm_nairobi")  # IBM hardware
-```
-
-**IR mapping:** `u1q` → Qiskit `U` gate (ZYZ decomposition)
-
----
-
-## rqm-braket
-
-[`rqm-braket`](https://github.com/RQM-Technologies-dev/rqm-braket) translates the `u1q` IR into Amazon Braket circuits and executes them locally or on AWS quantum hardware.
-
-**Install:**
-
-```bash
-pip install rqm-braket
-```
-
-**Key class:** `BraketBackend`
-
-```python
-from rqm_braket import BraketBackend
-
-backend = BraketBackend()
-result = backend.run_local(program)    # local simulator
-result = backend.run_device(program, device_arn="arn:...")  # AWS hardware
-```
-
-**IR mapping:** `u1q` → Braket arbitrary rotation gate
-
----
-
-## rqm-pennylane
-
-[`rqm-pennylane`](https://github.com/RQM-Technologies-dev/rqm-pennylane) provides a PennyLane integration, exposing RQM circuits as PennyLane devices and supporting differentiable quantum workflows.
-
-**Install:**
-
-```bash
-pip install rqm-pennylane
-```
-
-**Key class:** `PennyLaneBackend`
-
-```python
-from rqm_pennylane import PennyLaneBackend
-
-backend = PennyLaneBackend()
-result = backend.run_local(program)
-```
-
-**IR mapping:** `u1q` → PennyLane native rotation operation
-
----
-
-## Backend Interface Contract
-
-All backends implement the same interface:
-
-| Method | Description |
+| Backend hint or route | Current role |
 |---|---|
-| `run_local(program)` | Execute on a local simulator |
-| `run_device(program, **kwargs)` | Execute on hardware |
+| `generic` | Backend-neutral optimization/output posture |
+| `qiskit` | Qiskit-facing optimization hint and execution route |
+| `braket` | Braket-facing optimization hint and execution route |
 
-All backends return a `Result` object with a `counts` attribute:
-
-```python
-result.counts  # {"00": 512, "11": 512}
-```
-
-This normalized contract means programs are fully portable across backends.
+At the API layer, these appear in optimization and execution workflows.
 
 ---
 
-## Swapping Backends
+## Important distinction
 
-Swapping backends requires only one change:
+A backend hint on `/v1/circuits/optimize` is not the same thing as execution routing, and neither is the same thing as internal compiler IR.
 
-```python
-# Before
-result = run(qc, backend="qiskit")
+RQM keeps these concerns separate:
 
-# After
-result = run(qc, backend="braket")
-```
-
-The circuit, compiler pipeline, and result interface are identical in both cases.
+1. public circuit intake
+2. internal optimization
+3. optional explicit backend lowering
+4. execution routing and readiness checks
 
 ---
 
-!!! tip "See also"
-    - [Quickstart](../quickstart.md) — minimal working example
-    - [rqm-api API guide](rqm-api-api.md) — full `run()` function reference
-    - [Canonical IR (u1q)](../compiler/canonical-ir.md) — how backends consume the IR
+## What to document conservatively
+
+- some backend-hint behavior may be reserved or equivalent in the current release
+- execution availability should be inspected through capabilities, not assumed from a backend name alone
+- hardware-oriented flows still depend on provider readiness, credentials, and billing state
+
+See:
+
+- [Execution](execution.md)
+- [Execution Capabilities](execution-capabilities.md)
+- [Optimization](../optimization.md)

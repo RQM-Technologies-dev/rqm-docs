@@ -1,50 +1,66 @@
 # RQM Studio
 
-RQM Studio is the visual interface for the RQM platform. It integrates with `rqm-api` to provide a UI-driven workflow for circuit optimization, execution preparation, and result inspection — without writing code.
+RQM Studio is the **visual and workflow layer** for the RQM platform. It sits on top of `rqm-api` and organizes product workflows around theory, optimization, execution-oriented operations, jobs, and account surfaces.
+
+Studio is broader than a visualization demo, but it is also **not** the API. The canonical service boundary remains `rqm-api`.
 
 ---
 
-## What RQM Studio Does
+## What Studio covers
 
-| Capability | Description |
+| Workflow area | What Studio adds |
 |---|---|
-| [Optimize Circuits](optimize-circuits.md) | Reduce gate count and depth. Get back a cleaner circuit ready for execution. |
-| [Verify Optimizations](verify-optimizations.md) | Confirm that optimization preserved circuit behavior. Inspect what changed and why. |
-| [Visualize Quantum Geometry](visualize-quantum-geometry.md) | Explore circuit behavior through an interactive, geometry-native interface. |
-| Execution preparation | Configure and submit optimized circuits to Qiskit or Braket backends |
-| Result display | Inspect measurement counts and execution reports |
-
-!!! note "Execution UI"
-    Execution UI is enabled as backend support evolves. Current execution is available directly via the [API endpoints](../api/execution.md).
+| Theory and geometry | A visual interface for quaternionic / SU(2) ideas, Bloch intuition, and circuit interpretation |
+| Optimization | Intake, optimize, compare, and verification-oriented views over compiler results |
+| Execution-oriented workflows | Capability-aware execution setup, provider selection, and managed flow entry points |
+| Jobs and reporting | Job status, results inspection, and report-friendly workflow surfaces |
+| Import and intake | Circuit intake paths built on the public `rqm-circuits` boundary exposed through `rqm-api` |
+| Pro / account / billing | Account-bound surfaces for wallet, dashboard, spend controls, and managed readiness |
 
 ---
 
-## How It Works
+## The boundary that matters
 
-RQM Studio is a UI layer on top of `rqm-api`. Every action in Studio corresponds to an API call:
+Studio does not replace the API contract.
 
-| Studio action | API call |
+```text
+Studio
+  ↓
+rqm-api
+  ↓
+rqm-circuits 0.2
+  ↓
+rqm-compiler / u1q / backend lowering
+```
+
+That separation keeps UI workflows flexible while preserving a stable service boundary for integrations.
+
+---
+
+## What Studio is good for now
+
+- understanding the model through a geometry-aware interface
+- bringing in a circuit and checking whether it is valid and analyzable
+- running optimization workflows and reviewing what changed
+- moving from optimization toward execution using capability-aware choices
+- tracking jobs, reports, and account-bound operational surfaces
+
+---
+
+## What Studio should not imply
+
+- Studio is not a guarantee of backend or hardware availability
+- Studio is not the public wire-format definition
+- Studio is not the internal optimization engine
+- Studio billing readiness does not by itself guarantee hardware execution
+
+---
+
+## Next steps
+
+| Goal | Page |
 |---|---|
-| Upload circuit | `POST /v1/circuits/validate` |
-| Run optimization | `POST /v1/circuits/optimize` |
-| Execute on Qiskit | `POST /v1/execute/qiskit` |
-| Execute on Braket | `POST /v1/execute/braket` |
-| View result | `GET /v1/execute/braket/{job_id}` |
-
----
-
-## Getting Started
-
-The fastest way to experience the RQM optimization + execution pipeline is through the live API:
-
-1. Open the [Swagger UI](https://rqm-api.onrender.com/docs)
-2. Fetch an example circuit with `GET /v1/circuits/example`
-3. Submit it to `POST /v1/circuits/optimize`
-4. Inspect the result — optimized circuit, gate count, depth, and optimization report
-5. Optionally, execute via `POST /v1/execute/qiskit` or `POST /v1/execute/braket`
-
-For a guided walkthrough, see the [API Quickstart](../api/quickstart.md).
-
----
-
-🌐 **Website:** [https://rqmtechnologies.com](https://rqmtechnologies.com)
+| Understand Studio by workflow | [Studio Workflows](studio-workflows.md) |
+| Understand theory-facing surfaces | [Optimization Theory](optimization-theory.md) |
+| Understand Pro/account surfaces | [Studio Pro](studio-pro.md) |
+| Understand the API behind Studio | [API Overview](../api/rqm-api-api.md) |

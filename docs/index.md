@@ -1,190 +1,112 @@
 # RQM Platform
 
-**Geometry-aware quantum optimization and execution platform**
+RQM Technologies is a **quaternionic, compiler-first quantum software stack** built around SU(2)-native optimization, backend-agnostic public circuits, and workflow surfaces that extend from mathematical analysis to execution routing and Studio operations.
 
-> Upload a circuit → optimize it → execute it → get results
-
-**Public endpoint:** `https://rqm-api.onrender.com`
-
-[:material-lightning-bolt: Try API](https://rqm-api.onrender.com/docs){ .md-button .md-button--primary }
-[:material-monitor: Open Studio](https://rqmtechnologies.com){ .md-button }
-[:material-book-open-variant: View Docs](api/quickstart.md){ .md-button }
+[:material-lightning-bolt: API Quickstart](api/quickstart.md){ .md-button .md-button--primary }
+[:material-monitor: Studio Overview](applications/index.md){ .md-button }
+[:material-book-open-variant: Architecture](architecture.md){ .md-button }
 
 ---
 
-## What RQM Does
+## What RQM is
 
-RQM is a quantum optimization and execution platform. It sits between circuit creation and hardware execution, providing:
+RQM is not a generic SDK wrapper. It is a layered platform with clear technical boundaries:
 
-| Component | Package | Role |
+| Layer | Repository | Current role |
 |---|---|---|
-| Circuit IR | [`rqm-circuits`](https://github.com/RQM-Technologies-dev/rqm-circuits) | Canonical, backend-agnostic circuit representation |
-| Optimization engine | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) + [`rqm-optimize`](https://github.com/RQM-Technologies-dev/rqm-optimize) | SU(2)-aware gate fusion and circuit compression |
-| Execution + orchestration | [`rqm-api`](https://github.com/RQM-Technologies-dev/rqm-api) | HTTP service: optimize, execute, retrieve results |
-| UI interface | [RQM Studio](https://rqmtechnologies.com) | Visual layer for circuit workflows |
+| Mathematical spine | [`rqm-core`](https://github.com/RQM-Technologies-dev/rqm-core) | Quaternion, spinor, SU(2), Bloch, validation, linear algebra, and coupling-analysis primitives |
+| Optimization engine | [`rqm-compiler`](https://github.com/RQM-Technologies-dev/rqm-compiler) | Internal optimization and rewriting after the public circuit boundary; canonical 1Q IR is `u1q` |
+| Service boundary | `rqm-api` | HTTP intake for validation, analysis, optimization, execution routing, auth, billing, chat, and TTS |
+| Workflow layer | `rqm-studio` | Visual and operational layer for theory, optimization, execution-oriented flows, jobs, and account surfaces |
+
+The public circuit boundary remains **`rqm-circuits` schema `0.2`**. Internal compiler IR is separate by design.
 
 ---
 
-## Platform Architecture
+## Where RQM fits in the stack
 
-```
-User circuit (JSON or SDK)
+```text
+client / SDK / Studio
         │
         ▼
-   ┌─────────┐
-   │ rqm-api │  ← service layer: optimize + execute
-   └────┬────┘
+rqm-api  ← service boundary, policy, readiness, routing
         │
-   ┌────▼─────────┐
-   │ rqm-circuits │  ← canonical IR layer
-   └────┬─────────┘
+        ▼
+rqm-circuits 0.2  ← public wire format boundary
         │
-   ┌────▼──────────────────┐
-   │ rqm-compiler          │  ← optimization
-   │ + rqm-optimize        │
-   └────┬──────────────────┘
+        ▼
+rqm-compiler  ← internal optimization and rewriting engine
         │
-   ┌────┴───────────────────────┐
-   │                            │
-   ▼                            ▼
-rqm-qiskit                 rqm-braket
-(IBM / Qiskit execution)   (AWS Braket execution)
-        │                            │
-        └────────────┬───────────────┘
-                     ▼
-               result + report
+        ├── canonical internal 1Q IR: u1q
+        └── explicit later lowering for backend targets
+        │
+        ▼
+backend adapters / execution providers
 ```
 
-RQM Studio provides a UI on top of `rqm-api`, enabling visual circuit workflows and result inspection.
-
-For a full walkthrough of the stack, see [Ecosystem](ecosystem.md) and [Architecture](architecture.md).
+This is how RQM stays **backend-agnostic at the public circuit boundary** while still allowing explicit backend-targeted lowering and execution when requested.
 
 ---
 
-## Try It in 30 Seconds
+## What you can do now
 
-No install required. Use the live Swagger UI.
-
-**Step 1 — Open the API docs**
-
-[https://rqm-api.onrender.com/docs](https://rqm-api.onrender.com/docs)
-
-**Step 2 — Fetch an example circuit**
-
-```
-GET /v1/circuits/example
-```
-
-**Step 3 — Copy the returned JSON**
-
-The response is a valid circuit payload ready to use.
-
-**Step 4 — Optimize the circuit**
-
-```
-POST /v1/circuits/optimize
-```
-
-**Step 5 — Observe the result**
-
-- reduced gate count
-- reduced depth
-- structured optimization report
-
-**Step 6 — Execute (optional)**
-
-Send the optimized circuit to a real backend:
-
-```
-POST /v1/execute/qiskit
-```
-
-or
-
-```
-POST /v1/execute/braket
-```
+- Fetch valid named example circuits from the API (`bell`, `ghz`, `optimizable`)
+- Validate circuits against the current public schema and analyze them before optimization
+- Run optimization through a compiler pipeline that normalizes, canonicalizes, lowers to `u1q`, merges compatible 1Q structure, and cancels eligible 2Q structure
+- Inspect coupling / preservation signals through qualitative or measured analysis where supported
+- Check execution readiness with `GET /v1/execute/capabilities` before exposing backend choices
+- Route execution through Qiskit paths and Braket paths, including local simulation and held-job hardware flows where available
+- Use Studio as the visual and workflow layer for theory, optimization, execution-oriented tasks, jobs, reports, and Pro/account surfaces
 
 ---
 
-## Execution
+## Core platform boundaries
 
-RQM supports circuit execution via two backends:
+### `rqm-core`
+Owns the mathematical foundation. That includes quaternion and SU(2) primitives, Bloch/state utilities, validation helpers, linear algebra, and the coupling / entanglement analysis primitives used to support trust and preservation analysis.
 
-| Backend | Endpoint | Runtime |
-|---|---|---|
-| IBM Qiskit | `POST /v1/execute/qiskit` | Qiskit Aer simulator / IBM hardware |
-| Amazon Braket | `POST /v1/execute/braket` | Braket local simulator / AWS hardware |
+### `rqm-compiler`
+Begins **after** the public `rqm-circuits` boundary. Named gates are lowered into the canonical internal single-qubit form `u1q`. Backend-targeted lowering is a later, explicit stage.
 
-Execution requests accept an optimized circuit and a shot count. Responses include measurement results and job metadata.
+### `rqm-api`
+Exposes the current service surface: circuits, coupling analysis, execution, authentication, billing/wallet, and media-oriented endpoints. Responses follow a stable operational envelope with `status`, `data` or `error`, and `meta`.
 
-For full endpoint details, see the [Execution reference](api/execution.md).
+### `rqm-studio`
+Sits on top of `rqm-api`. Studio is the product workflow layer, not the service boundary. It organizes user flows; the API remains canonical for service integration.
 
 ---
 
-## What You Get
+## Why the compiler-first model matters
 
-| Output | Description |
+RQM optimization is **proof-gated and fail-closed**.
+
+- Only verified optimization candidates are committed
+- If verification cannot be established, the original circuit is returned unchanged
+- Backend-targeted lowering happens after optimization, not during public-circuit intake
+
+That separation is central to the trust story: public interchange stays stable, optimization stays internal, and backend lowering stays explicit.
+
+---
+
+## What is still evolving
+
+RQM documents some surfaces conservatively on purpose:
+
+- Measured coupling analysis is **not** unrestricted; current measured coverage is limited and qualitative fallback remains part of the contract
+- Some optimization profile and backend-hint combinations are currently equivalent or reserved in the current release
+- Billing and Pro readiness do **not** by themselves guarantee hardware execution; provider readiness, credentials, validation, and quote/hold state still matter
+- Studio covers broader product workflows today, but route-level maturity is not uniform enough to describe every surface as equally deep
+
+---
+
+## Start in the right place
+
+| Goal | Page |
 |---|---|
-| Optimized circuit | The transformed circuit with fewer gates |
-| Gate count reduction | Before/after gate count |
-| Depth reduction | Before/after circuit depth |
-| Canonical structure | SU(2)-normalized gate representation |
-| Optimization report | Structured summary of all transformations applied |
-| Execution results | Measurement counts from Qiskit or Braket |
-
----
-
-## Where RQM Fits
-
-RQM sits between circuit creation and hardware execution:
-
-```
-user circuit  →  RQM optimize  →  RQM execute  →  backend (IBM / AWS)
-```
-
-RQM does not own hardware. It enhances Qiskit and Braket by providing a geometry-aware optimization layer before execution.
-
----
-
-## Who This Is For
-
-- **Quantum developers** evaluating circuit optimization tooling
-- **Researchers** wanting geometry-correct, reproducible optimization
-- **Labs and government evaluators** assessing quantum middleware
-- **Companies building quantum pipelines** that need optimization before execution
-
----
-
-## What RQM Is NOT
-
-- **Not a hardware provider** — RQM does not own or operate quantum hardware
-- **Not a simulator vendor** — RQM delegates simulation to Qiskit and Braket
-- **Not replacing Qiskit or Braket** — RQM enhances those systems with geometry-aware optimization
-- **Not a visualization tool** — the optimization and execution pipeline is the core product; visualization is secondary
-
----
-
-## Future Roadmap
-
-Planned capabilities:
-
-- Backend-aware optimization (topology-informed gate scheduling)
-- Asynchronous optimization jobs
-- Batch circuit execution
-- Hardware topology support
-- Performance benchmarks and reproducibility reports
-
----
-
-## Troubleshooting
-
-**Common error:** `"instructions": ["string"]`
-
-This is a Swagger placeholder. The `instructions` field must be a list of structured gate objects, not plain strings.
-
-**Fix:** Use `GET /v1/circuits/example` to get a valid payload, then submit that to `POST /v1/circuits/optimize`.
-
----
-
-🌐 **Website:** [https://rqmtechnologies.com](https://rqmtechnologies.com)
+| Make your first API call | [API Quickstart](api/quickstart.md) |
+| Understand the service surface | [API Overview](api/rqm-api-api.md) |
+| Understand the visual/workflow layer | [Studio Overview](applications/index.md) |
+| Understand platform boundaries | [Architecture](architecture.md) |
+| Understand optimization semantics | [Optimization](optimization.md) |
+| Understand the internal canonical IR | [Canonical IR (`u1q`)](compiler/canonical-ir.md) |
+| Understand the broader stack | [Ecosystem](ecosystem.md) |

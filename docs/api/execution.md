@@ -1,29 +1,53 @@
-# Execution Reference
+# Execution
 
-RQM supports circuit execution via IBM Qiskit and Amazon Braket. After optimizing a circuit with `POST /v1/circuits/optimize`, you can submit it directly to a backend for measurement.
+Execution in RQM is a **routed service surface**, not a blanket promise of backend availability. The current API distinguishes Qiskit paths, Braket local paths, and held-job hardware flows, and clients should consult capabilities before offering any of them.
 
 **Base URL:** `https://rqm-api.onrender.com`
 
-[:material-book-open-variant: Swagger UI](https://rqm-api.onrender.com/docs){ .md-button .md-button--primary }
+[:material-clipboard-check-outline: Execution Capabilities](execution-capabilities.md){ .md-button .md-button--primary }
+[:material-book-open-variant: API Overview](rqm-api-api.md){ .md-button }
 
 ---
 
-## Overview
+## Current endpoints
 
-| Endpoint | Method | Backend | Description |
-|---|---|---|---|
-| `/v1/execute/qiskit` | `POST` | IBM Qiskit | Execute on Qiskit Aer simulator or IBM hardware |
-| `/v1/execute/braket` | `POST` | Amazon Braket | Execute on Braket local simulator or AWS hardware |
-| `/v1/execute/braket/devices` | `GET` | Amazon Braket | List available Braket devices |
-| `/v1/execute/braket/{job_id}` | `GET` | Amazon Braket | Retrieve result of an async Braket job |
+| Endpoint | Method | Role |
+|---|---|---|
+| `/v1/execute/qiskit` | `POST` | Qiskit local / IBM execution path |
+| `/v1/execute/braket` | `POST` | Braket local simulator path and managed submission surface |
+| `/v1/execute/braket/held/{job_id}` | `POST` | Held-job hardware submission flow |
+| `/v1/execute/braket/devices` | `GET` | Device discovery for Braket-facing workflows |
+| `/v1/execute/braket/{job_id}` | `GET` | Job status / result lookup |
+| `/v1/execute/capabilities` | `GET` | Readiness inspection before offering execution options |
 
 ---
 
-## Qiskit Execution
+## Recommended order of operations
+
+1. **Validate or optimize the circuit**
+2. **Check `GET /v1/execute/capabilities`**
+3. **Inspect Braket devices if relevant**
+4. **Choose a provider path intentionally**
+5. **For billed hardware, complete quote/hold readiness first**
+6. **Submit execution and poll or continue the held-job flow as needed**
+
+This order matters because capability, credentials, provider availability, and billing state can all affect what should be shown to the user.
+
+---
+
+## Qiskit: local / IBM path
 
 ### `POST /v1/execute/qiskit`
 
-Execute a circuit on IBM Qiskit. By default, uses the Aer local simulator.
+Use this path when you are routing through the Qiskit side of the platform.
+
+What to document honestly:
+
+- local Qiskit execution and IBM-oriented execution share the same endpoint surface
+- actual availability depends on deployment configuration and credentials
+- the endpoint should not be described as universal instant IBM hardware access
+
+Typical use:
 
 ```bash
 curl -X POST https://rqm-api.onrender.com/v1/execute/qiskit \
@@ -31,32 +55,15 @@ curl -X POST https://rqm-api.onrender.com/v1/execute/qiskit \
   -d @optimized.json
 ```
 
-**Request body fields:**
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `circuit` | object | Yes | Circuit payload (use output from `/v1/circuits/optimize` or `/v1/circuits/example`) |
-| `shots` | integer | No | Number of measurement shots (default: 1024) |
-| `device` | string | No | IBM device identifier for hardware execution |
-
-**Response:**
-
-```json
-{
-  "counts": {"00": 512, "11": 512},
-  "shots": 1024,
-  "backend": "qiskit",
-  "device": "aer_simulator"
-}
-```
-
 ---
 
-## Braket Execution
+## Braket: local simulator path
 
 ### `POST /v1/execute/braket`
 
-Execute a circuit on Amazon Braket. By default, uses the local Braket simulator.
+This endpoint covers the Braket-facing execution path. In the current release, it should be documented as the entry point for Braket local simulation and managed Braket submission workflows.
+
+Typical use:
 
 ```bash
 curl -X POST https://rqm-api.onrender.com/v1/execute/braket \
@@ -64,141 +71,62 @@ curl -X POST https://rqm-api.onrender.com/v1/execute/braket \
   -d @optimized.json
 ```
 
-**Request body fields:**
+Related inspection endpoints:
 
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `circuit` | object | Yes | Circuit payload |
-| `shots` | integer | No | Number of measurement shots (default: 1024) |
-| `device_arn` | string | No | AWS Braket device ARN for hardware execution |
+- `GET /v1/execute/braket/devices`
+- `GET /v1/execute/braket/{job_id}`
 
-**Response (synchronous):**
+---
 
-```json
-{
-  "counts": {"00": 510, "11": 514},
-  "shots": 1024,
-  "backend": "braket",
-  "job_id": null
-}
-```
+## Held-job billed hardware flow
 
-**Response (async job):**
+### `POST /v1/execute/braket/held/{job_id}`
 
-When a hardware device is specified, the response includes a `job_id` that you can use to retrieve the result later:
+Use this when a hardware-oriented workflow requires an explicit hold before execution. This is the clearest place to distinguish RQM's managed hardware submission flow from ordinary local simulation.
 
-```json
-{
-  "job_id": "arn:aws:braket:us-east-1:123456789:quantum-task/abc123",
-  "status": "QUEUED",
-  "backend": "braket"
-}
-```
+Documented conservatively, this flow depends on:
+
+- provider/backend readiness
+- valid credentials and account state
+- hardware quote / hold state
+- billing state
+- circuit validation and any execution-policy checks
+
+A hold is therefore an operational readiness step, not a guarantee that the provider path will execute successfully under all conditions.
+
+---
+
+## Capability inspection is part of execution
+
+### `GET /v1/execute/capabilities`
+
+This endpoint should be treated as part of the execution contract, not optional decoration. Use it before rendering provider options in Studio or any client.
+
+Why it matters:
+
+- it helps separate available from unavailable routes
+- it keeps clients from advertising hardware options prematurely
+- it supports clearer distinction between local, managed, and billed execution surfaces
+
+See [Execution Capabilities](execution-capabilities.md).
+
+---
+
+## Device and job inspection
 
 ### `GET /v1/execute/braket/devices`
 
-List available Amazon Braket devices.
-
-```bash
-curl https://rqm-api.onrender.com/v1/execute/braket/devices
-```
-
-**Response:**
-
-```json
-{
-  "devices": [
-    {"name": "local_simulator", "arn": null, "status": "available"},
-    {"name": "IonQ Harmony", "arn": "arn:aws:braket:::device/qpu/ionq/Harmony", "status": "available"}
-  ]
-}
-```
+Use this to inspect Braket-facing device inventory or readiness metadata relevant to the current deployment.
 
 ### `GET /v1/execute/braket/{job_id}`
 
-Retrieve the result of an async Braket job by job ID.
-
-```bash
-curl https://rqm-api.onrender.com/v1/execute/braket/{job_id}
-```
-
-**Response (completed):**
-
-```json
-{
-  "job_id": "arn:aws:braket:...",
-  "status": "COMPLETED",
-  "counts": {"00": 510, "11": 514},
-  "shots": 1024
-}
-```
-
-**Response (in progress):**
-
-```json
-{
-  "job_id": "arn:aws:braket:...",
-  "status": "RUNNING",
-  "counts": null
-}
-```
+Use this to poll or inspect job state after asynchronous or managed execution submission.
 
 ---
 
-## Synchronous vs Asynchronous Execution
+## What execution docs should not imply
 
-| Mode | Backends | Behavior |
-|---|---|---|
-| Synchronous | Qiskit (local), Braket (local) | Response includes results immediately |
-| Asynchronous | Braket (hardware) | Response includes a `job_id`; poll for results |
-
-For local simulators, results are returned synchronously in the response body.
-
-For hardware execution on Braket, the API returns a `job_id`. Use `GET /v1/execute/braket/{job_id}` to poll for the result until `status` is `"COMPLETED"`.
-
----
-
-## End-to-End Example
-
-Optimize and execute a circuit in two steps:
-
-```bash
-# Step 1: fetch an example circuit
-curl https://rqm-api.onrender.com/v1/circuits/example > example.json
-
-# Step 2: optimize it
-curl -X POST https://rqm-api.onrender.com/v1/circuits/optimize \
-  -H "Content-Type: application/json" \
-  -d @example.json > optimized.json
-
-# Step 3: execute on Qiskit
-curl -X POST https://rqm-api.onrender.com/v1/execute/qiskit \
-  -H "Content-Type: application/json" \
-  -d @optimized.json
-```
-
----
-
-## Python SDK
-
-Execution is also available via the Python SDK:
-
-```python
-from rqm_api import run
-
-# Optimize and execute in one call
-result = run(qc, backend="qiskit", optimize=True, shots=1024)
-print(result.counts)
-# {"00": 512, "11": 512}
-
-# Braket backend
-result = run(qc, backend="braket", optimize=True)
-print(result.counts)
-```
-
----
-
-!!! note "See also"
-    - [API Quickstart](quickstart.md) — get started in 30 seconds
-    - [rqm-api reference](rqm-api-api.md) — full endpoint documentation
-    - [Backends overview](backends.md) — SDK backend details
+- Billing readiness is not hardware entitlement
+- Capability presence is not the same as guaranteed provider uptime
+- Studio availability is not a substitute for API readiness checks
+- Backend hints during optimization are not the same thing as execution routing
