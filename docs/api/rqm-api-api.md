@@ -1,6 +1,6 @@
-# RQM API — Reference
+# `rqm-api` Overview
 
-`rqm-api` is the HTTP service for geometry-aware quantum circuit optimization and execution. It is the primary entry point to the RQM platform: submit a circuit, optimize it, and execute it on a real backend — all through a single service.
+`rqm-api` is the **canonical service boundary** for the current RQM platform. It sits above the public `rqm-circuits` wire format and coordinates validation, analysis, optimization, execution readiness, execution routing, account state, billing surfaces, and selected media endpoints.
 
 **Base URL:** `https://rqm-api.onrender.com`
 
@@ -9,160 +9,158 @@
 
 ---
 
-## Core Endpoints
+## Circuits
 
-### `POST /v1/circuits/optimize`
+Current circuit endpoints:
 
-The primary optimization endpoint. Upload a quantum circuit. Get back a measurably better one.
+- `POST /v1/circuits/validate`
+- `POST /v1/circuits/analyze`
+- `POST /v1/circuits/optimize`
+- `GET /v1/circuits/example`
 
-What you get back:
+Important semantics:
 
-- **Optimized circuit** — fewer gates, lower depth
-- **Gate count reduction** — before and after
-- **Depth reduction** — before and after
-- **Canonical structure** — SU(2)-normalized gate representation
-- **Optimization report** — structured summary of all transformations applied
+- Public wire format is **`rqm-circuits` schema `0.2`**
+- Legacy `0.1` may still be accepted for compatibility, but `0.2` is current
+- `GET /v1/circuits/example` supports `bell`, `ghz`, and `optimizable`; omitting `name` returns all examples
+- `/v1/circuits/analyze` includes compatibility entanglement enrichment
+- `/v1/circuits/optimize` accepts optimization `profile` (`safe`, `balanced`, `aggressive`) and backend hint (`generic`, `qiskit`, `braket`)
 
-```bash
-curl -X POST https://rqm-api.onrender.com/v1/circuits/optimize \
-  -H "Content-Type: application/json" \
-  -d @example.json
-```
-
-Use `GET /v1/circuits/example` to get a valid `example.json` payload.
+This surface should be read as the public intake layer above the compiler, not as a description of internal IR.
 
 ---
 
-## Support Endpoints
+## Coupling analysis
 
-### `GET /v1/circuits/example`
+Current analysis endpoints:
 
-Returns a ready-to-use example circuit payload. Use this to test `/optimize` or the execution endpoints without constructing a circuit manually.
+- `POST /v1/analysis/coupling`
+- `POST /v1/analysis/coupling/compare`
 
-```bash
-curl https://rqm-api.onrender.com/v1/circuits/example
-```
+These endpoints expose coupling / preservation analysis derived from the `rqm-core` analysis primitives. They are especially useful when optimization trust matters, but the docs describe them conservatively:
 
-### `POST /v1/circuits/validate`
+- qualitative and measured modes are distinct
+- measured scope is limited
+- fallback to qualitative analysis is part of the design, not a failure mode
 
-Checks whether a circuit payload is well-formed. Use this before submitting to `/optimize` if you are constructing circuits programmatically.
-
-```bash
-curl -X POST https://rqm-api.onrender.com/v1/circuits/validate \
-  -H "Content-Type: application/json" \
-  -d @example.json
-```
-
-### `POST /v1/circuits/analyze`
-
-Returns a structural analysis of the circuit (gate count, depth, gate types) without optimizing it.
-
-```bash
-curl -X POST https://rqm-api.onrender.com/v1/circuits/analyze \
-  -H "Content-Type: application/json" \
-  -d @example.json
-```
+See [Coupling Analysis](coupling-analysis.md).
 
 ---
 
-## Execution Endpoints
+## Execution
 
-RQM supports circuit execution via IBM Qiskit and Amazon Braket. Send an optimized circuit to a backend and retrieve results.
+Current execution endpoints:
 
-### `POST /v1/execute/qiskit`
+- `POST /v1/execute/qiskit`
+- `POST /v1/execute/braket`
+- `POST /v1/execute/braket/held/{job_id}`
+- `GET /v1/execute/braket/devices`
+- `GET /v1/execute/braket/{job_id}`
+- `GET /v1/execute/capabilities`
 
-Execute a circuit on IBM Qiskit (Aer simulator or IBM hardware).
+The important boundary is **readiness before routing**. Clients should check capabilities before exposing provider-specific options. Qiskit, Braket local simulation, and held/billed hardware flows have different operational requirements.
 
-```bash
-curl -X POST https://rqm-api.onrender.com/v1/execute/qiskit \
-  -H "Content-Type: application/json" \
-  -d @optimized.json
-```
+See:
 
-### `POST /v1/execute/braket`
-
-Execute a circuit on Amazon Braket (local simulator or AWS hardware).
-
-```bash
-curl -X POST https://rqm-api.onrender.com/v1/execute/braket \
-  -H "Content-Type: application/json" \
-  -d @optimized.json
-```
-
-### `GET /v1/execute/braket/devices`
-
-List available Amazon Braket devices.
-
-```bash
-curl https://rqm-api.onrender.com/v1/execute/braket/devices
-```
-
-### `GET /v1/execute/braket/{job_id}`
-
-Retrieve the result of an async Braket job by job ID.
-
-```bash
-curl https://rqm-api.onrender.com/v1/execute/braket/{job_id}
-```
-
-For full endpoint details, see the [Execution reference](execution.md).
+- [Execution](execution.md)
+- [Execution Capabilities](execution-capabilities.md)
 
 ---
 
-## Role of `rqm-api`
+## Authentication
 
-`rqm-api` is the top of the stack. It coordinates circuit intake, compilation, optimization, execution, and result delivery:
+Current auth endpoints:
 
-```
-circuit input (JSON)
-    → rqm-api
-        ├── rqm-compiler (gate resolution → u1q IR)
-        ├── rqm-optimize (gate fusion, compression)
-        ├── rqm-qiskit  (IBM execution)
-        ├── rqm-braket  (AWS execution)
-        └── result: optimized circuit + execution report
-```
+- `GET /v1/auth/diagnostics`
+- `POST /v1/auth/register`
+- `POST /v1/auth/login`
+- `GET /v1/auth/me`
+- `POST /v1/auth/logout`
 
-Its responsibilities:
+These endpoints support the bearer-session model used for account, Pro, billing, and managed workflow surfaces.
 
-1. **Circuit intake** — accept and validate circuit payloads
-2. **Pipeline coordination** — invoke the compiler and optimizer
-3. **Backend dispatch** — route execution to Qiskit or Braket
-4. **Result delivery** — return a structured response with optimized circuit and execution report
+See [Authentication](authentication.md).
 
 ---
 
-## Python SDK
+## Billing & wallet
 
-The API is also accessible via the Python SDK. See [SDK Quickstart](../quickstart.md) for setup.
+Current billing and wallet endpoints:
 
-```python
-from rqm_api import run
+- `GET /v1/billing/profile`
+- `GET /v1/billing/summary`
+- `GET /v1/billing/wallet`
+- `GET /v1/billing/jobs`
+- `GET /v1/billing/spend-controls`
+- `PATCH /v1/billing/spend-controls`
+- `GET /v1/billing/auto-recharge/attempts`
+- `GET /v1/billing/recovery-status`
+- `GET /v1/billing/dashboard`
+- `POST /v1/billing/auto-recharge/test`
+- `POST /v1/billing/hardware/quote`
+- `POST /v1/billing/hardware/hold`
+- `POST /v1/billing/hardware/hold/{job_id}/release`
+- `POST /v1/billing/stripe/customer`
+- `POST /v1/billing/stripe/setup-intent`
+- `POST /v1/billing/stripe/payment-intent`
+- `POST /v1/billing/stripe/checkout-session`
+- `POST /v1/billing/stripe/portal-session`
+- `POST /v1/billing/stripe/reconcile-checkout`
+- `POST /v1/billing/stripe/webhook`
 
-result = run(qc, backend="qiskit", optimize=True)
-print(result.counts)
+These surfaces describe payment readiness, wallet state, and hardware quote/hold orchestration. They do **not** imply guaranteed hardware access by themselves.
+
+See [Billing & Wallet](billing-and-wallet.md).
+
+---
+
+## Chat & TTS
+
+Current media-oriented endpoints:
+
+- `POST /v1/chat`
+- `POST /v1/tts`
+
+These sit beside the core circuit workflows. Availability may depend on deployment configuration.
+
+See [Chat & TTS](chat-and-tts.md).
+
+---
+
+## Response envelope and operational notes
+
+The API uses a consistent response shape:
+
+### Success
+
+```json
+{
+  "status": "ok",
+  "data": {},
+  "meta": {}
+}
 ```
 
-**Parameters**:
-- `circuit` — a `rqm_circuits.Circuit` object (or compatible gate list).
-- `backend` — string backend name (`"qiskit"`, `"braket"`) or a backend instance.
-- `shots` — optional number of measurement shots (default: `1024`).
-- `optimize` — optional boolean; if `True`, runs optimization before execution (default: `False`).
-- `device` — optional device identifier for hardware execution (default: local simulator).
+### Error
 
-**Returns**: `rqm_api.result.Result` object.
+```json
+{
+  "status": "error",
+  "error": {},
+  "meta": {}
+}
+```
 
----
+`meta` includes:
 
-## Troubleshooting
+- `version`
+- `request_id`
+- `processing_time_ms`
 
-**Error: `"instructions": ["string"]`**
+Operationally important truths:
 
-This is the default Swagger placeholder. The `instructions` field must contain structured gate objects, not plain strings.
-
-**Fix:** Use `GET /v1/circuits/example` to get a valid payload, then send that to `POST /v1/circuits/optimize`.
-
----
-
-!!! note "Full schema"
-    For request/response schemas and field-level documentation, use the [Swagger UI](https://rqm-api.onrender.com/docs). Auto-generated Python API docs are planned for a future release. In the meantime, refer to the source code in the [`rqm-api` repository](https://github.com/RQM-Technologies-dev/rqm-api).
+- the API boundary is public; internal compiler IR is not
+- capabilities should be checked before exposing execution choices
+- optimization remains proof-gated and fail-closed under the hood
+- billing or Stripe readiness is not equivalent to backend/provider entitlement
+- Studio sits on top of this API; Studio is not a replacement for the service contract
