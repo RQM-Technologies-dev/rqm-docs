@@ -41,18 +41,18 @@ Build output is written to `site/`.
 
 ---
 
-## Vercel deployment posture
+## Vercel deployment
 
-This repository is configured for static publishing on Vercel.
+This repository is a static MkDocs site and is deployed on Vercel using a project-local virtual environment.
 
-- **Framework preset:** `Other` (explicitly disable framework auto-detection)
-- **Install command:** `pip install -r requirements.txt`
-- **Build command:** `mkdocs build --strict`
-- **Output directory:** `site`
+Vercel's Python runtime may be externally managed (for example by `uv`), so direct system-level `pip install` can fail. Creating and using `.venv` keeps dependency installation isolated from the managed system Python and avoids `externally-managed-environment` errors.
 
-The repository `vercel.json` pins this behavior with `"framework": null`, which maps to Vercel's **Other** framework preset and prevents Python backend entrypoint checks.
+- **Framework preset:** `Other` (`"framework": null` in `vercel.json`)
+- **Install command:** `python -m venv .venv && . .venv/bin/activate && python -m pip install --upgrade pip && pip install -r requirements.txt`
+- **Build command:** `. .venv/bin/activate && mkdocs build --strict`
+- **Output directory:** `site/`
 
-If the project was previously configured as Python in the Vercel dashboard, update it to **Framework Preset = Other** and trigger a redeploy.
+The `site/` directory is the published static output from MkDocs.
 
 ---
 
