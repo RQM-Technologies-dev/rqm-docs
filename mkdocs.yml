@@ -1,5 +1,5 @@
 site_name: RQM Platform
-site_description: RQM — quaternionic, compiler-first quantum software spanning optimization, execution routing, analysis, and Studio workflows.
+site_description: Product documentation for RQM circuit optimization, execution routing, and geometry-native analysis.
 site_url: https://docs.rqmtechnologies.com/
 
 repo_name: RQM-Technologies-dev/rqm-docs
@@ -50,41 +50,35 @@ extra_css:
 
 nav:
   - Home: index.md
-  - Quickstart: api/quickstart.md
-  - Studio:
-      - Overview: applications/index.md
-      - Workflows: applications/studio-workflows.md
-      - Optimization Theory: applications/optimization-theory.md
-      - Pro: applications/studio-pro.md
-      - Optimize Circuits: applications/optimize-circuits.md
-      - Verify Optimizations: applications/verify-optimizations.md
-      - Visualize Quantum Geometry: applications/visualize-quantum-geometry.md
-  - API Reference:
-      - Overview: api/rqm-api-api.md
-      - API Quickstart: api/quickstart.md
+  - Getting Started:
+      - Quickstart: getting-started/quickstart.md
+      - Installation: installation.md
+      - SDK / local setup: getting-started/sdk-local-setup.md
+  - Platform:
+      - Overview: platform/overview.md
+      - Architecture: platform/architecture.md
+      - Ecosystem: platform/ecosystem.md
+      - Canonical Circuit Boundary (rqm-circuits): platform/canonical-circuit-boundary.md
+      - Optimization Engine (rqm-compiler): platform/optimization-engine.md
+      - Execution Bridges (rqm-qiskit, rqm-braket, rqm-pennylane): platform/execution-bridges.md
+  - Products:
+      - RQM Studio: products/rqm-studio.md
+      - Optimization API: products/optimization-api.md
+      - Execution Workflows: products/execution-workflows.md
+      - Verification / Trust: products/verification-trust.md
+  - API:
+      - API Overview: api/overview.md
+      - Circuits: api/circuits.md
       - Execution: api/execution.md
-      - Execution Capabilities: api/execution-capabilities.md
-      - Coupling Analysis: api/coupling-analysis.md
-      - Authentication: api/authentication.md
       - Billing & Wallet: api/billing-and-wallet.md
+      - Auth: api/authentication.md
       - Chat & TTS: api/chat-and-tts.md
-      - rqm-core: api/rqm-core-api.md
-      - rqm-compiler: api/rqm-compiler-api.md
-      - Backends: api/backends.md
+      - Compiler Actions: api/compiler-actions.md
   - Concepts:
-      - Overview: concepts.md
-      - Ecosystem: ecosystem.md
-      - Architecture: architecture.md
-      - Optimization: optimization.md
+      - Quaternion intuition: concepts/quaternion-intuition.md
+      - Spinors and Bloch sphere: concepts/spinor-bloch.md
+      - SU(2) geometry: concepts/su2-geometry.md
+      - Global phase: concepts/global-phase.md
       - Canonical IR (u1q): compiler/canonical-ir.md
-      - Notebooks: notebooks.md
-      - Install: installation.md
-      - SDK Quickstart: quickstart.md
-      - Deep Dives:
-          - Quaternion Intuition: concepts/quaternion-intuition.md
-          - Spinors and the Bloch Sphere: concepts/spinor-bloch.md
-          - SU(2) Geometry: concepts/su2-geometry.md
-          - Global Phase: concepts/global-phase.md
-          - Complete Quaternion Theory: concepts/quaternion-theory.md
   - Research:
-      - QCE 2026 Paper Draft: research/qce2026-u1q-paper.md
+      - QCE 2026 paper draft: research/qce2026-u1q-paper.md
