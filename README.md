@@ -45,11 +45,14 @@ Build output is written to `site/`.
 
 This repository is configured for static publishing on Vercel.
 
+- **Framework preset:** `Other` (explicitly disable framework auto-detection)
 - **Install command:** `pip install -r requirements.txt`
 - **Build command:** `mkdocs build --strict`
 - **Output directory:** `site`
 
-Connect this repository in Vercel and use standard static project settings. The `vercel.json` file in this repository encodes the expected build posture.
+The repository `vercel.json` pins this behavior with `"framework": null`, which maps to Vercel's **Other** framework preset and prevents Python backend entrypoint checks.
+
+If the project was previously configured as Python in the Vercel dashboard, update it to **Framework Preset = Other** and trigger a redeploy.
 
 ---
 
