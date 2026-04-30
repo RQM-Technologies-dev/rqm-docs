@@ -11,6 +11,7 @@ Agent-ready quantum software documentation for circuit validation, optimization,
 [:material-robot-outline: Connect an Agent](agents/index.md){ .md-button .md-button--primary }
 [:material-file-document-outline: Read llms.txt](llms.txt){ .md-button }
 [:material-api: API Overview](api/overview.md){ .md-button }
+[:material-domain: Company + Product Map](company-overview.md){ .md-button }
 [:material-rocket-launch: Quickstart](getting-started/quickstart.md){ .md-button }
 
 </div>
@@ -80,3 +81,12 @@ Use trust and verification pages to understand proof-gated and fail-closed behav
 | Research Assistant | [QCE 2026 paper draft](research/qce2026-u1q-paper.md) and [SU(2) geometry](concepts/su2-geometry.md) |
 
 </div>
+
+
+## Documentation posture
+
+This site separates production, beta, research, and planned material so integrations stay grounded in documented behavior.
+
+- Production and beta: use for implementation with route/schema checks.
+- Research and planned: treat as non-contractual unless shipped in documented API surfaces.
+- Start with [Company + Product Map](company-overview.md) for entity/layer relationships.
