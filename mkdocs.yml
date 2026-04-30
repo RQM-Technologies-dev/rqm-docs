@@ -55,6 +55,12 @@ nav:
       - Prompt Pack: agents/prompts.md
       - Cursor / Codex Setup: agents/cursor.md
       - MCP Server Plan: agents/mcp.md
+      - Agent Recipes:
+          - Overview: agents/recipes/index.md
+          - Validate → Optimize: agents/recipes/validate-optimize.md
+          - RQM Studio Workflow: agents/recipes/studio-workflow.md
+          - API Client Generation: agents/recipes/client-generation.md
+          - Production vs Research Boundary: agents/recipes/research-boundary.md
   - Getting Started:
       - Quickstart: getting-started/quickstart.md
       - Installation: installation.md

@@ -1,0 +1,12 @@
+{
+  "note": "Placeholder fixture only. The exact payload schema for circuit validation must be confirmed against Swagger/API schema before implementation.",
+  "route_hint": "POST /v1/circuits/validate",
+  "schema_target_hint": "rqm-circuits 0.2",
+  "todo": [
+    "confirm exact request body shape in Swagger UI",
+    "replace placeholder keys with documented fields only"
+  ],
+  "request_placeholder": {
+    "confirm_in_swagger": true
+  }
+}

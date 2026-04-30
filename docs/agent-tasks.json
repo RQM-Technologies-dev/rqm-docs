@@ -1,0 +1,231 @@
+{
+  "version": "1.0",
+  "updated_utc": "2026-04-30T00:00:00Z",
+  "tasks": {
+    "validate_circuit_payload": {
+      "title": "Validate circuit payload",
+      "status": "production",
+      "docs": [
+        "/api/circuits/",
+        "/platform/canonical-circuit-boundary/",
+        "/api/overview/"
+      ],
+      "required_first_steps": [
+        "Read /llms.txt",
+        "Confirm schema target and route in Swagger UI",
+        "Prepare payload against public rqm-circuits boundary"
+      ],
+      "allowed_surfaces": [
+        "rqm-api",
+        "rqm-circuits"
+      ],
+      "forbidden_assumptions": [
+        "Assuming internal rqm-compiler IR is a public payload contract",
+        "Inventing undocumented request fields"
+      ],
+      "expected_artifacts": [
+        "validation_request.json",
+        "validation_response.json",
+        "validation_error_report.md"
+      ]
+    },
+    "analyze_circuit": {
+      "title": "Analyze a validated circuit",
+      "status": "production",
+      "docs": [
+        "/api/circuits/",
+        "/api/overview/"
+      ],
+      "required_first_steps": [
+        "Ensure payload is already validated",
+        "Confirm analyze route in Swagger UI"
+      ],
+      "allowed_surfaces": [
+        "rqm-api"
+      ],
+      "forbidden_assumptions": [
+        "Generating synthetic analysis fields not returned by API"
+      ],
+      "expected_artifacts": [
+        "analyze_request.json",
+        "analyze_response.json"
+      ]
+    },
+    "optimize_circuit": {
+      "title": "Optimize a validated circuit",
+      "status": "production",
+      "docs": [
+        "/api/circuits/",
+        "/platform/optimization-engine/",
+        "/products/verification-trust/"
+      ],
+      "required_first_steps": [
+        "Validate payload first",
+        "Confirm optimize route/schema in Swagger UI",
+        "Attach request metadata"
+      ],
+      "allowed_surfaces": [
+        "rqm-api",
+        "rqm-compiler (service internal)"
+      ],
+      "forbidden_assumptions": [
+        "Claiming guaranteed quantum advantage",
+        "Treating optimization candidate as committed proof without artifacts"
+      ],
+      "expected_artifacts": [
+        "optimize_request.json",
+        "optimize_response.json",
+        "optimization_diff_or_metrics.json"
+      ]
+    },
+    "generate_verification_report": {
+      "title": "Generate verification/trust report",
+      "status": "production",
+      "docs": [
+        "/products/verification-trust/",
+        "/api/overview/"
+      ],
+      "required_first_steps": [
+        "Collect request/response artifacts",
+        "Check available verification metadata"
+      ],
+      "allowed_surfaces": [
+        "rqm-api",
+        "documentation artifact pipeline"
+      ],
+      "forbidden_assumptions": [
+        "Treating missing proof metadata as proof"
+      ],
+      "expected_artifacts": [
+        "verification-report.md",
+        "artifact-index.json"
+      ]
+    },
+    "route_execution": {
+      "title": "Route execution through provider bridge",
+      "status": "beta",
+      "docs": [
+        "/api/execution/",
+        "/platform/execution-bridges/",
+        "/api/overview/"
+      ],
+      "required_first_steps": [
+        "Validate/optimize flow complete",
+        "Confirm provider route and capabilities"
+      ],
+      "allowed_surfaces": [
+        "rqm-api execution",
+        "execution bridges"
+      ],
+      "forbidden_assumptions": [
+        "Assuming every provider supports identical options"
+      ],
+      "expected_artifacts": [
+        "execution_request.json",
+        "execution_response.json",
+        "provider_route_metadata.json"
+      ]
+    },
+    "build_studio_workflow": {
+      "title": "Build an RQM Studio workflow",
+      "status": "production",
+      "docs": [
+        "/agents/recipes/studio-workflow/",
+        "/products/rqm-studio/",
+        "/api/overview/"
+      ],
+      "required_first_steps": [
+        "Define workflow states",
+        "Map each state to documented API call",
+        "Define trust/reporting surfaces"
+      ],
+      "allowed_surfaces": [
+        "rqm-studio",
+        "rqm-api",
+        "rqm-circuits"
+      ],
+      "forbidden_assumptions": [
+        "Treating Studio as canonical computational contract"
+      ],
+      "expected_artifacts": [
+        "studio-workflow-spec.md",
+        "ui-copy-guidelines.md"
+      ]
+    },
+    "generate_api_client": {
+      "title": "Generate typed API client",
+      "status": "production",
+      "docs": [
+        "/agents/recipes/client-generation/",
+        "/api/overview/",
+        "/api/circuits/"
+      ],
+      "required_first_steps": [
+        "Confirm routes in Swagger UI",
+        "Define typed response envelope",
+        "Plan validate-before-optimize helper"
+      ],
+      "allowed_surfaces": [
+        "documented rqm-api routes"
+      ],
+      "forbidden_assumptions": [
+        "Generating undocumented methods",
+        "Hard-coding inferred schemas"
+      ],
+      "expected_artifacts": [
+        "typed-client-source/",
+        "tests/fixtures/",
+        "integration-notes.md"
+      ]
+    },
+    "debug_payload_error": {
+      "title": "Debug failed payload",
+      "status": "production",
+      "docs": [
+        "/agents/recipes/validate-optimize/",
+        "/api/circuits/",
+        "/platform/canonical-circuit-boundary/"
+      ],
+      "required_first_steps": [
+        "Capture raw request/response",
+        "Identify failing route",
+        "Compare against documented boundary"
+      ],
+      "allowed_surfaces": [
+        "request/response artifacts",
+        "documented schema guidance"
+      ],
+      "forbidden_assumptions": [
+        "Silently dropping unknown fields without recording the change"
+      ],
+      "expected_artifacts": [
+        "payload-error-analysis.md",
+        "corrected_payload_candidate.json"
+      ]
+    },
+    "explain_research_boundary": {
+      "title": "Explain production vs research boundary",
+      "status": "documented",
+      "docs": [
+        "/agents/recipes/research-boundary/",
+        "/products/verification-trust/",
+        "/compiler/canonical-ir/"
+      ],
+      "required_first_steps": [
+        "Classify source statements by status",
+        "Separate public API claims from conceptual claims"
+      ],
+      "allowed_surfaces": [
+        "documentation summaries",
+        "status-labeled implementation notes"
+      ],
+      "forbidden_assumptions": [
+        "Presenting conceptual or planned features as shipped behavior"
+      ],
+      "expected_artifacts": [
+        "boundary-classification-table.md",
+        "safe-language-checklist.md"
+      ]
+    }
+  }
+}

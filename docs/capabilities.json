@@ -66,5 +66,11 @@
     "https://docs.rqmtechnologies.com/",
     "https://docs.rqmtechnologies.com/api/overview/",
     "https://rqm-api.onrender.com/docs"
+  ],
+  "agent_task_manifest": "/agent-tasks.json",
+  "recipe_entrypoint": "/agents/recipes/",
+  "example_fixtures": [
+    "/examples/agent-circuit-validation.placeholder.json",
+    "/examples/agent-optimization-request.placeholder.json"
   ]
 }
