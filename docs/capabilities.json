@@ -1,0 +1,70 @@
+{
+  "platform": "RQM Platform",
+  "canonical_docs_url": "https://docs.rqmtechnologies.com/",
+  "api_base_url": "https://rqm-api.onrender.com",
+  "swagger_url": "https://rqm-api.onrender.com/docs",
+  "agent_ready": true,
+  "capabilities": [
+    {
+      "name": "circuit_validation",
+      "status": "production",
+      "surface": "rqm-api",
+      "notes": "Validate public circuit payloads before downstream workflows."
+    },
+    {
+      "name": "circuit_analysis",
+      "status": "production",
+      "surface": "rqm-api",
+      "notes": "Analyze validated circuits using documented API behavior."
+    },
+    {
+      "name": "circuit_optimization",
+      "status": "production",
+      "surface": "rqm-api + rqm-compiler",
+      "notes": "Optimization is trust-sensitive and proof-gated per docs posture."
+    },
+    {
+      "name": "execution_routing",
+      "status": "beta",
+      "surface": "execution bridges",
+      "notes": "Bridge-aware routing for provider paths (Qiskit/IBM, Braket, PennyLane)."
+    },
+    {
+      "name": "quaternionic_su2_utilities",
+      "status": "documented",
+      "surface": "rqm-core concepts",
+      "notes": "Quaternionic/SU(2) and geometry-native analysis concepts are documented."
+    },
+    {
+      "name": "mcp_tooling_surface",
+      "status": "planned",
+      "surface": "agents/mcp plan",
+      "notes": "Proposed MCP interface; not a production interface claim."
+    }
+  ],
+  "recommended_agent_rules": [
+    "Read /llms.txt first.",
+    "Use API Overview and Swagger UI to confirm routes and payloads.",
+    "Validate circuit payloads before optimization.",
+    "Use public circuit boundary payload contracts before internal assumptions.",
+    "Do not invent undocumented endpoints.",
+    "Separate production-supported behavior from research concepts.",
+    "Avoid overclaiming physical advantage without benchmark or output artifacts."
+  ],
+  "production_surfaces": [
+    "docs/api/overview.md",
+    "docs/platform/canonical-circuit-boundary.md",
+    "docs/platform/optimization-engine.md",
+    "docs/platform/execution-bridges.md",
+    "docs/products/verification-trust.md"
+  ],
+  "research_surfaces": [
+    "docs/research/qce2026-u1q-paper.md",
+    "docs/agents/mcp.md"
+  ],
+  "contact_or_docs_links": [
+    "https://docs.rqmtechnologies.com/",
+    "https://docs.rqmtechnologies.com/api/overview/",
+    "https://rqm-api.onrender.com/docs"
+  ]
+}

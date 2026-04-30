@@ -5,8 +5,13 @@ RQM is a quantum software platform for circuit optimization, execution routing, 
 [:material-rocket-launch: Quickstart](getting-started/quickstart.md){ .md-button .md-button--primary }
 [:material-view-dashboard-outline: Platform Overview](platform/overview.md){ .md-button }
 [:material-api: API Overview](api/overview.md){ .md-button }
+[:material-robot-outline: Connect an Agent](agents/index.md){ .md-button .md-button--primary }
 
 ---
+
+## Agent-ready docs
+
+RQM documentation now ships both human-readable guides and machine-readable agent entrypoints. Start with `/llms.txt`, then use `/llms-full.txt`, `/capabilities.json`, [API Overview](api/overview.md), and [Swagger UI](https://rqm-api.onrender.com/docs) to ground implementation choices in documented behavior.
 
 ## What the platform does
 
