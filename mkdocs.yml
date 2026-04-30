@@ -50,6 +50,11 @@ extra_css:
 
 nav:
   - Home: index.md
+  - Agent Connect:
+      - Agent Portal: agents/index.md
+      - Prompt Pack: agents/prompts.md
+      - Cursor / Codex Setup: agents/cursor.md
+      - MCP Server Plan: agents/mcp.md
   - Getting Started:
       - Quickstart: getting-started/quickstart.md
       - Installation: installation.md

@@ -1,0 +1,49 @@
+# RQM Docs Agent Guide (Concise)
+
+- site_identity: RQM Platform documentation (MkDocs Material)
+- canonical_docs_url: https://docs.rqmtechnologies.com/
+- api_base_url: https://rqm-api.onrender.com
+- swagger_url: https://rqm-api.onrender.com/docs
+
+## Key docs
+
+- Agent Portal: /agents/
+- Prompt Pack: /agents/prompts/
+- Cursor / Codex Setup: /agents/cursor/
+- API Overview: /api/overview/
+- Quickstart: /getting-started/quickstart/
+- Platform Overview: /platform/overview/
+- Canonical Circuit Boundary: /platform/canonical-circuit-boundary/
+- Optimization Engine: /platform/optimization-engine/
+- Execution Bridges: /platform/execution-bridges/
+- Verification / Trust: /products/verification-trust/
+
+## Core capabilities
+
+- Circuit validation, analysis, and optimization via `rqm-api`
+- Execution routing through explicit bridges (Qiskit/IBM, Braket, PennyLane)
+- Quaternionic/SU(2) math utilities and geometry-native analysis across platform components
+- RQM Studio workflow layer for browser-based orchestration
+
+## Agent rules
+
+1. Read this file first.
+2. Use documented API routes and Swagger UI.
+3. Validate circuit payloads before optimization.
+4. Use public circuit boundary payloads; do not assume internal IR contracts.
+5. Do not invent undocumented endpoints/fields.
+6. Label research concepts as research.
+7. Keep claims conservative; do not claim physical advantage without benchmark or output artifact evidence.
+8. Generate reproducible artifacts where possible.
+
+## Production vs research
+
+- Production/documented: public API boundary, schema-guided payload exchange, trust posture, execution bridge model.
+- Research: speculative workflows, unshipped MCP tools, or unverified performance/advantage claims.
+
+## Recommended first steps
+
+1. Read `/llms.txt` and `/api/overview/`.
+2. Confirm routes in Swagger UI.
+3. Start from documented example payloads.
+4. Implement validate -> analyze/optimize -> execution flow.
