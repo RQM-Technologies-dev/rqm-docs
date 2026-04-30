@@ -59,3 +59,8 @@
 - Production vs Research Boundary: /agents/recipes/research-boundary/
 
 Prefer these recipes before inventing new workflows or assuming undocumented routes/schemas.
+
+- Agent Contract: /agents/contract/
+- Agent Contract Manifest: /agent-contract.json
+
+Before implementing, check the Agent Contract and Agent Recipes.

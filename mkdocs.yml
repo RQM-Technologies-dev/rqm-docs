@@ -55,6 +55,9 @@ nav:
       - Prompt Pack: agents/prompts.md
       - Cursor / Codex Setup: agents/cursor.md
       - MCP Server Plan: agents/mcp.md
+      - Agent Contract: agents/contract.md
+      - Compliance Checklist: agents/contract-checklist.md
+      - Contract Tests: agents/contract-tests.md
       - Agent Recipes:
           - Overview: agents/recipes/index.md
           - Validate → Optimize: agents/recipes/validate-optimize.md
