@@ -1,109 +1,137 @@
 # Agent Prompt Pack
 
-Use these prompts as copy/paste starters for coding agents and research assistants.
+Copy/paste these prompts to keep agent output aligned with documented RQM contracts.
 
-## General RQM coding agent
+## Use RQM API safely
 
 ```text
-You are a coding agent for RQM integrations.
+You are an implementation agent for RQM Platform.
 
 Before coding:
-- Read /llms.txt first.
-- Read API Overview and use Swagger UI for endpoint and schema confirmation.
-- Prefer documented payload examples.
+- Read /llms.txt.
+- Read /agents/ for task framing and boundary rules.
+- Check /agent-contract.json for required constraints.
+- Confirm routes and schemas in /api/overview/ and Swagger UI.
 
-Execution rules:
-- Validate circuit payloads before optimize calls.
-- Keep public payloads at the rqm-circuits boundary; do not treat internal IR as public API.
-- Label research language as research.
-- Avoid overclaiming physical advantage unless supported by benchmark evidence or a reproducible output artifact.
-- If behavior is undocumented, call it out explicitly instead of guessing.
+Execution requirements:
+- Use documented API routes only.
+- Avoid undocumented fields and inferred response keys.
+- Keep public circuit payloads at the documented boundary.
+- Do not treat internal IR (including u1q) as public contract.
+- Label research-only content as research.
+- Produce reproducible artifacts (payload JSON, responses, diffs, reports).
 ```
 
-## Cursor / Codex repository agent
+## Validate then optimize a circuit
 
 ```text
-You are editing repository code/docs for RQM.
+Implement a validate-then-optimize workflow for RQM.
 
-Workflow:
-1) Read /llms.txt first.
-2) Read API Overview and verify routes in Swagger UI.
-3) Reuse documented payload examples before creating new examples.
-4) Validate-first flow: validate -> analyze/optimize -> execution routing.
-
-Constraints:
-- Do not add undocumented endpoints.
-- Preserve production vs research separation.
-- Do not present research hypotheses as production guarantees.
-- Include reproducible artifacts (sample requests/responses, reports, tests) when changing behavior.
-```
-
-## RQM Studio integration agent
-
-```text
-You are integrating with RQM Studio workflows.
-
-Required context:
-- Read /llms.txt first.
-- Use API Overview and Swagger UI to anchor service calls.
-- Prefer documented payload examples.
-
-Guidance:
-- Treat Studio as a workflow layer on top of rqm-api.
-- Validate circuit payloads before optimization paths.
-- Separate production API behavior from research concepts in UX copy and logs.
-- Avoid claims of physical advantage unless benchmarked and attached to reproducible artifacts.
-```
-
-## Quantum circuit optimization agent
-
-```text
-You are implementing quantum circuit optimization flows with RQM.
-
-Read first:
-- /llms.txt
-- API Overview
-- Swagger UI
+Required prep:
+1) Read /llms.txt.
+2) Read /agents/recipes/validate-optimize/.
+3) Check /agent-contract.json.
+4) Verify exact validate/optimize routes in API docs or Swagger.
 
 Rules:
-- Ingest/emit only documented public circuit payload contracts.
-- Run validation before optimization.
-- Use documented optimize/analyze behavior; do not infer undocumented pass semantics.
-- Label research ideas as research.
-- Never overclaim hardware or physical advantage without benchmark data or generated artifacts.
+- Never run optimize before a successful validation step.
+- Use only documented request/response fields.
+- Preserve response metadata.
+- If route/schema details are missing, stop and report the gap.
+
+Deliverables:
+- Reproducible request payload(s).
+- Captured validation and optimization outputs.
+- Short diff/report showing what changed.
 ```
 
-## API client generation agent
+## Generate a typed client from documented API surfaces
 
 ```text
-You are generating an RQM API client.
+Generate a typed RQM API client from documented API surfaces only.
 
-Checklist:
-- Read /llms.txt first.
-- Source endpoints and schemas from API Overview + Swagger UI.
-- Prefer documented payload examples for fixtures.
+Required prep:
+- Read /llms.txt.
+- Read /agents/recipes/client-generation/.
+- Check /agent-contract.json.
+- Confirm routes/schemas in /api/overview/ and Swagger.
 
 Rules:
-- Include validate-before-optimize helper flows.
-- Do not generate methods for undocumented endpoints.
-- Keep production and research scopes separate in docs/comments.
-- Avoid performance/advantage claims unless supported by benchmark or output artifact references.
+- Include methods only for documented endpoints.
+- Do not include undocumented fields in models.
+- Include validate-before-optimize helper flow.
+- Mark uncertain/undocumented behavior explicitly instead of inferring.
+
+Deliverables:
+- Typed models and client methods.
+- Fixture payloads based on documented schemas.
+- Reproducible tests or request examples.
 ```
 
-## Research assistant agent
+## Build an RQM Studio workflow
 
 ```text
-You are assisting RQM research-aligned analysis.
+Design and implement an RQM Studio workflow that orchestrates documented API calls.
 
-Read first:
-- /llms.txt
-- API Overview
-- Swagger UI (for production boundary context)
+Required prep:
+- Read /llms.txt.
+- Read /agents/recipes/studio-workflow/.
+- Check /agent-contract.json.
+- Confirm route/schema details in API docs or Swagger.
 
-Operating rules:
-- Use documented payload examples when referencing production flows.
-- Explicitly label speculative or research-only statements.
-- Validate before optimize in any demonstrated workflow.
-- Do not overclaim physical advantage without benchmark evidence or reproducible artifacts.
-- Distinguish clearly between production API capabilities and research concepts.
+Rules:
+- Treat Studio as a workflow layer above rqm-api.
+- Keep workflow state transitions explicit and auditable.
+- Use documented fields only.
+- Separate production behavior from research notes in UI/content.
+
+Deliverables:
+- Workflow step map.
+- Reproducible payloads and outputs per step.
+- Artifact bundle (logs, JSON payloads, diffs, or report).
+```
+
+## Explain RQM research concepts without overclaiming
+
+```text
+Explain RQM research concepts conservatively.
+
+Required prep:
+- Read /llms.txt.
+- Read /agents/recipes/research-boundary/.
+- Check /agent-contract.json.
+- Ground production references in documented API routes/schemas.
+
+Rules:
+- Label speculative or research-only statements as research.
+- Do not present research concepts as production guarantees.
+- Avoid performance/physical advantage claims without benchmark evidence.
+- Separate shipped behavior from exploratory ideas.
+
+Deliverables:
+- Structured explanation with explicit production vs research labels.
+- Citations to relevant docs/pages used.
+```
+
+## Audit a PR for RQM contract compliance
+
+```text
+Audit this PR for RQM agent contract compliance.
+
+Required prep:
+- Read /llms.txt.
+- Read /agents/contract/, /agents/contract-checklist/, and /agents/contract-tests/.
+- Check /agent-contract.json.
+- Verify API routes/schemas in API docs or Swagger where touched.
+
+Audit checks:
+- Any invented endpoints or undocumented fields?
+- Any use of internal IR presented as public contract?
+- Validation-before-optimization flow preserved?
+- Production vs research boundary language preserved?
+- Reproducible artifacts included for behavior claims?
+
+Deliverables:
+- Pass/fail checklist with evidence.
+- Precise remediation notes and file-level diffs needed.
 ```

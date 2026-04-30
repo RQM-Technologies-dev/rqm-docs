@@ -1,111 +1,95 @@
-# RQM Docs Agent Guide (Full)
+# RQM Agent Ingestion Guide (Full)
 
-## Platform summary
+## Platform identity
 
-RQM is a quantum software and API platform with explicit boundaries for public circuit intake, internal optimization, execution routing, and workflow orchestration. The platform is designed for conservative, reproducible engineering workflows where payload stability and trust semantics are primary.
+RQM is a quantum software and API platform with a conservative, API-first posture. It is designed for circuit validation, optimization, execution routing, quaternionic/SU(2) math utilities, geometry-native analysis, and RQM Studio workflows.
 
 Canonical docs URL: https://docs.rqmtechnologies.com/
 
-## Stack summary
+## Public contract boundaries
 
-- `rqm-core`: shared mathematical and analysis primitives (including quaternionic/SU(2) math utilities and geometry-native analysis support).
-- `rqm-circuits`: canonical external circuit boundary (schema `0.2`) for stable public payload exchange.
-- `rqm-compiler`: internal optimization engine with canonical internal single-qubit IR (`u1q`).
-- `rqm-api`: service boundary for validate/analyze/optimize, execution, billing/wallet, auth, and chat/TTS domains.
-- execution bridges: explicit backend targeting/lowering layers (`rqm-qiskit`, `rqm-braket`, `rqm-pennylane`).
-- `rqm-studio`: browser workflow layer for guided user flows.
+Treat public contracts as the implementation boundary:
 
-## RQM Studio summary
+- Public circuit intake is schema-driven (`rqm-circuits`, documented schema target).
+- Public behavior is defined by documented API routes and schemas (API docs + Swagger).
+- Response envelope structure and documented fields are contract material.
 
-RQM Studio is a workflow and orchestration surface above `rqm-api`. Treat Studio as a product UX layer; it is not the canonical computation layer and does not replace API boundary contracts.
+Do **not** treat internal optimizer representations (including `u1q`) as public API contracts.
 
-## API summary
+## Production vs research boundary
 
-- Base URL: https://rqm-api.onrender.com
-- Swagger UI: https://rqm-api.onrender.com/docs
-- Reference entry page: /api/overview/
+Production/documented scope:
 
-Key documented circuit endpoints include validate/analyze/optimize and example retrieval as described in product/API docs.
+- Documented API routes and schemas.
+- Validation/analyze/optimize/execution behavior described in product and API docs.
+- Verification/trust posture represented in shipped docs.
 
-## Circuit validation / optimization / execution summary
+Research scope:
 
-Recommended path:
+- Speculative theory framing and exploratory workflow ideas.
+- Proposed or unshipped integrations/tooling.
+- Performance or physical-advantage claims without documented benchmark evidence.
 
-1. Submit public payloads aligned with `rqm-circuits` schema `0.2`.
-2. Validate payloads first.
-3. Analyze and optimize through documented API routes.
-4. Route execution through explicit bridge-aware workflows.
+Rule: label research explicitly as research and keep production claims bounded.
 
-Boundary posture:
+## Known repo ecosystem
 
-- Public callers should not depend on internal canonical IR forms.
-- Backend-specific lowering remains in execution bridges.
-- Unknown capabilities should be handled conservatively.
+Key components referenced across docs:
 
-## Trust / verification posture
+- `rqm-core`: shared math and analysis primitives.
+- `rqm-circuits`: public circuit payload boundary.
+- `rqm-compiler`: internal optimization engine.
+- `rqm-api`: service/API boundary.
+- Execution bridges: `rqm-qiskit`, `rqm-braket`, `rqm-pennylane`.
+- `rqm-studio`: workflow UX/orchestration layer over the API.
 
-RQM documentation frames optimization as proof-gated and fail-closed. Rewrites are expected to be verified before commit; unverified candidates should not be represented as committed improvements. Reproducible artifacts (reports/metrics/payload diffs) should be preferred in partner or enterprise contexts.
+Treat this as architecture context, not permission to infer undocumented external contracts.
 
-## Concepts summary
+## API-first usage expectations
 
-The platform references quaternion, spinor, Bloch, and SU(2)-aligned conceptual models to support geometry-native analysis and explainability. These concepts can guide reasoning and tooling but should not be misrepresented as standalone production guarantees.
+For implementation tasks:
 
-## Research caution
+1. Read `/llms.txt`.
+2. Read `/agents/` entry pages and relevant task recipe.
+3. Read `/agent-contract.json` and compliance pages.
+4. Confirm exact route/schema behavior in `/api/overview/` and Swagger.
+5. Build validate-first workflows (`validate -> analyze/optimize -> execution`).
+6. Save reproducible artifacts for each behavior claim.
 
-Keep production behavior separate from research concepts:
+## What not to infer
 
-- Label speculative methods as research.
-- Do not claim proven physical or hardware advantage unless backed by documented benchmark results or generated artifacts.
-- Treat proposed MCP tools and unshipped workflows as planned/proposed.
+- Do not invent endpoints, methods, request fields, or response fields.
+- Do not infer internal pass ordering or optimizer IR semantics as public behavior.
+- Do not infer provider capabilities beyond documented execution bridge behavior.
+- Do not convert research language into production guarantees.
 
-## Prompt examples
+If docs are unclear, report the uncertainty instead of guessing.
 
-### Minimal coding-agent bootstrap
+## Citation and evidence expectations
 
-```text
-Read /llms.txt first. Then use /api/overview/ and Swagger UI to confirm routes and schemas.
-Implement validate-before-optimize flows using public circuit payload contracts.
-Do not invent endpoints or undocumented fields.
-Label research statements as research.
-```
+When producing outputs (PRs, design notes, implementation plans, audits):
 
-### Integration-agent bootstrap
+- Cite the docs pages used for routes, schemas, and boundary rules.
+- Tie each behavior claim to a documented source or reproducible artifact.
+- Distinguish “documented production behavior” from “research interpretation.”
 
-```text
-Use documented payload examples and API routes only.
-Treat RQM Studio as a workflow layer above the API.
-Keep internal optimizer assumptions out of public contracts.
-Attach reproducible artifacts (requests/responses/reports) for behavior claims.
-```
+## Suggested artifact outputs
 
-## Link map
+Prefer outputs that another engineer or agent can replay:
+
+- Request payload JSON and response JSON.
+- Validation/optimization before-vs-after diffs.
+- Route/schema confirmation notes (from API docs/Swagger).
+- Workflow step logs for Studio orchestration.
+- Contract compliance checklist results for PR audits.
+
+## High-value links
 
 - Agent Portal: /agents/
 - Prompt Pack: /agents/prompts/
-- Cursor / Codex Setup: /agents/cursor/
-- MCP Server Plan: /agents/mcp/
-- API Overview: /api/overview/
-- Quickstart: /getting-started/quickstart/
-- Platform Overview: /platform/overview/
-- Architecture: /platform/architecture/
-- Canonical Circuit Boundary: /platform/canonical-circuit-boundary/
-- Optimization Engine: /platform/optimization-engine/
-- Execution Bridges: /platform/execution-bridges/
-- Verification / Trust: /products/verification-trust/
-
-
-## Agent recipes
-
-- Agent task manifest: /agent-tasks.json
-- Agent Recipes: /agents/recipes/
-- Validate → Optimize: /agents/recipes/validate-optimize/
-- RQM Studio Workflow: /agents/recipes/studio-workflow/
-- API Client Generation: /agents/recipes/client-generation/
-- Production vs Research Boundary: /agents/recipes/research-boundary/
-
-Prefer these recipes before inventing new workflows or assuming undocumented routes/schemas.
-
 - Agent Contract: /agents/contract/
-- Agent Contract Manifest: /agent-contract.json
-
-Before implementing, check the Agent Contract and Agent Recipes.
+- Contract Checklist: /agents/contract-checklist/
+- Contract Tests: /agents/contract-tests/
+- Agent Recipes: /agents/recipes/
+- API Overview: /api/overview/
+- Swagger UI: https://rqm-api.onrender.com/docs

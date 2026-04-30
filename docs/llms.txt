@@ -1,66 +1,28 @@
-# RQM Docs Agent Guide (Concise)
+# RQM Agent Guide (Concise)
 
 - site_identity: RQM Platform documentation (MkDocs Material)
 - canonical_docs_url: https://docs.rqmtechnologies.com/
 - api_base_url: https://rqm-api.onrender.com
 - swagger_url: https://rqm-api.onrender.com/docs
 
-## Key docs
+## Platform scope
 
-- Agent Portal: /agents/
-- Prompt Pack: /agents/prompts/
-- Cursor / Codex Setup: /agents/cursor/
-- API Overview: /api/overview/
-- Quickstart: /getting-started/quickstart/
-- Platform Overview: /platform/overview/
-- Canonical Circuit Boundary: /platform/canonical-circuit-boundary/
-- Optimization Engine: /platform/optimization-engine/
-- Execution Bridges: /platform/execution-bridges/
-- Verification / Trust: /products/verification-trust/
+RQM Platform supports circuit validation, optimization, execution routing, quaternionic/SU(2) math utilities, geometry-native analysis, and RQM Studio workflow orchestration.
 
-## Core capabilities
+## Recommended agent flow
 
-- Circuit validation, analysis, and optimization via `rqm-api`
-- Execution routing through explicit bridges (Qiskit/IBM, Braket, PennyLane)
-- Quaternionic/SU(2) math utilities and geometry-native analysis across platform components
-- RQM Studio workflow layer for browser-based orchestration
+1. Read `/llms.txt`.
+2. Read `/agents/`.
+3. Read `/agent-contract.json`.
+4. Use `/agents/recipes/` for task-specific workflows.
+5. Confirm route/schema details in API docs or Swagger before implementation.
+6. Produce reproducible payloads, outputs, diffs, or reports.
 
-## Agent rules
+## Hard constraints
 
-1. Read this file first.
-2. Use documented API routes and Swagger UI.
-3. Validate circuit payloads before optimization.
-4. Use public circuit boundary payloads; do not assume internal IR contracts.
-5. Do not invent undocumented endpoints/fields.
-6. Label research concepts as research.
-7. Keep claims conservative; do not claim physical advantage without benchmark or output artifact evidence.
-8. Generate reproducible artifacts where possible.
-
-## Production vs research
-
-- Production/documented: public API boundary, schema-guided payload exchange, trust posture, execution bridge model.
-- Research: speculative workflows, unshipped MCP tools, or unverified performance/advantage claims.
-
-## Recommended first steps
-
-1. Read `/llms.txt` and `/api/overview/`.
-2. Confirm routes in Swagger UI.
-3. Start from documented example payloads.
-4. Implement validate -> analyze/optimize -> execution flow.
-
-
-## Agent recipes
-
-- Agent task manifest: /agent-tasks.json
-- Agent Recipes: /agents/recipes/
-- Validate → Optimize: /agents/recipes/validate-optimize/
-- RQM Studio Workflow: /agents/recipes/studio-workflow/
-- API Client Generation: /agents/recipes/client-generation/
-- Production vs Research Boundary: /agents/recipes/research-boundary/
-
-Prefer these recipes before inventing new workflows or assuming undocumented routes/schemas.
-
-- Agent Contract: /agents/contract/
-- Agent Contract Manifest: /agent-contract.json
-
-Before implementing, check the Agent Contract and Agent Recipes.
+- Use documented API routes and schemas only.
+- Validate circuit payloads before optimization.
+- Do not treat internal IR (including `u1q`) as a public API contract.
+- Do not invent undocumented endpoints or fields.
+- Label research content as research.
+- Keep production claims conservative and bounded to documented behavior.
