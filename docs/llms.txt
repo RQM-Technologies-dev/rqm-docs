@@ -47,3 +47,15 @@
 2. Confirm routes in Swagger UI.
 3. Start from documented example payloads.
 4. Implement validate -> analyze/optimize -> execution flow.
+
+
+## Agent recipes
+
+- Agent task manifest: /agent-tasks.json
+- Agent Recipes: /agents/recipes/
+- Validate → Optimize: /agents/recipes/validate-optimize/
+- RQM Studio Workflow: /agents/recipes/studio-workflow/
+- API Client Generation: /agents/recipes/client-generation/
+- Production vs Research Boundary: /agents/recipes/research-boundary/
+
+Prefer these recipes before inventing new workflows or assuming undocumented routes/schemas.

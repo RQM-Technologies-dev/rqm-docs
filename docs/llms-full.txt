@@ -92,3 +92,15 @@ Attach reproducible artifacts (requests/responses/reports) for behavior claims.
 - Optimization Engine: /platform/optimization-engine/
 - Execution Bridges: /platform/execution-bridges/
 - Verification / Trust: /products/verification-trust/
+
+
+## Agent recipes
+
+- Agent task manifest: /agent-tasks.json
+- Agent Recipes: /agents/recipes/
+- Validate → Optimize: /agents/recipes/validate-optimize/
+- RQM Studio Workflow: /agents/recipes/studio-workflow/
+- API Client Generation: /agents/recipes/client-generation/
+- Production vs Research Boundary: /agents/recipes/research-boundary/
+
+Prefer these recipes before inventing new workflows or assuming undocumented routes/schemas.

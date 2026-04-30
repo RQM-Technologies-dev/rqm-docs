@@ -1,0 +1,13 @@
+{
+  "note": "Placeholder fixture only. The exact optimization request schema must be confirmed against Swagger/API schema before implementation.",
+  "route_hint": "POST /v1/circuits/optimize",
+  "dependency": "validated circuit payload required",
+  "todo": [
+    "confirm exact request body shape in Swagger UI",
+    "use documented fields only",
+    "preserve request metadata"
+  ],
+  "request_placeholder": {
+    "confirm_in_swagger": true
+  }
+}

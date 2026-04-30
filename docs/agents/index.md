@@ -50,3 +50,13 @@ You are implementing against RQM.
 | Quantum circuit evaluator | Compare validation/optimization outputs and trust artifacts |
 | Research assistant | Explore concepts while clearly labeling research vs production behavior |
 | Partner/evaluator | Review architecture, trust posture, and integration readiness |
+
+
+## Next: use recipes
+
+- [Agent Recipes](recipes/index.md)
+- [Validate → Optimize Workflow](recipes/validate-optimize.md)
+- [RQM Studio Agent Workflow](recipes/studio-workflow.md)
+- [Generate an RQM API Client](recipes/client-generation.md)
+- [Production vs Research Boundary](recipes/research-boundary.md)
+- Machine-readable task manifest: [`/agent-tasks.json`](../agent-tasks.json)
