@@ -7,16 +7,19 @@ repo_url: https://github.com/RQM-Technologies-dev/rqm-docs
 
 theme:
   name: material
+  font:
+    text: Inter
+    code: JetBrains Mono
   palette:
     - scheme: default
-      primary: indigo
-      accent: indigo
+      primary: deep purple
+      accent: cyan
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - scheme: slate
-      primary: indigo
-      accent: indigo
+      primary: deep purple
+      accent: cyan
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
@@ -24,6 +27,12 @@ theme:
     - navigation.tabs
     - navigation.sections
     - navigation.top
+    - navigation.instant
+    - navigation.tracking
+    - navigation.indexes
+    - navigation.expand
+    - content.action.edit
+    - content.tooltips
     - search.highlight
     - content.code.copy
 
@@ -47,6 +56,7 @@ extra_javascript:
 
 extra_css:
   - assets/css/pdf-print.css
+  - assets/css/rqm-modern.css
 
 nav:
   - Home: index.md

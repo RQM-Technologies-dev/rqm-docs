@@ -1,0 +1,110 @@
+/* RQM modern visual layer for MkDocs Material */
+:root {
+  --rqm-hero-grad: radial-gradient(1200px circle at 12% 8%, color-mix(in srgb, var(--md-primary-fg-color) 35%, transparent), transparent 45%),
+    radial-gradient(900px circle at 88% 12%, color-mix(in srgb, var(--md-accent-fg-color) 30%, transparent), transparent 42%);
+  --rqm-surface: color-mix(in srgb, var(--md-default-bg-color) 90%, var(--md-default-fg-color) 10%);
+  --rqm-border: color-mix(in srgb, var(--md-default-fg-color) 18%, transparent);
+  --rqm-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+}
+
+[data-md-color-scheme="slate"] {
+  --rqm-surface: color-mix(in srgb, var(--md-default-bg-color) 88%, white 12%);
+  --rqm-border: color-mix(in srgb, white 14%, transparent);
+  --rqm-shadow: 0 16px 34px rgba(0, 0, 0, 0.35);
+}
+
+.md-main__inner { margin-top: 0.8rem; }
+
+.rqm-home {
+  position: relative;
+  padding: 1.2rem 0 0.6rem;
+}
+
+.rqm-home::before {
+  content: "";
+  position: absolute;
+  inset: -1.2rem -1rem auto;
+  height: 24rem;
+  background: var(--rqm-hero-grad);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.rqm-grid {
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--md-default-fg-color) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--md-default-fg-color) 6%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+  border-radius: 1.15rem;
+}
+
+.rqm-card {
+  background: color-mix(in srgb, var(--rqm-surface) 84%, transparent);
+  border: 1px solid var(--rqm-border);
+  border-radius: 1rem;
+  box-shadow: var(--rqm-shadow);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 1.1rem 1.25rem;
+}
+
+.rqm-hero h1 {
+  margin-bottom: 0.35rem;
+  font-size: clamp(2rem, 4.3vw, 3.2rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+.rqm-hero p {
+  font-size: 1.05rem;
+  max-width: 62ch;
+}
+
+.rqm-button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.rqm-kicker {
+  text-transform: uppercase;
+  font-size: 0.73rem;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+  margin-bottom: 0.35rem;
+}
+
+.rqm-cols-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.95rem;
+}
+
+.rqm-flow {
+  font-family: var(--md-code-font-family);
+  border-radius: 0.9rem;
+  border: 1px solid var(--rqm-border);
+  padding: 0.95rem 1rem;
+  background: color-mix(in srgb, var(--md-code-bg-color) 80%, transparent);
+}
+
+.md-typeset table:not([class]) {
+  border: 1px solid var(--rqm-border);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.md-typeset .admonition,
+.md-typeset details {
+  border-width: 1px;
+  border-radius: 0.8rem;
+}
+
+.md-typeset pre > code {
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 720px) {
+  .rqm-card { padding: 1rem; }
+  .rqm-home::before { height: 19rem; }
+}
