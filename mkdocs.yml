@@ -60,6 +60,7 @@ extra_css:
 
 nav:
   - Home: index.md
+  - Company & Product Map: company-overview.md
   - Agent Connect:
       - Agent Portal: agents/index.md
       - Prompt Pack: agents/prompts.md
@@ -107,3 +108,16 @@ nav:
       - Canonical IR (u1q): compiler/canonical-ir.md
   - Research:
       - QCE 2026 paper draft: research/qce2026-u1q-paper.md
+  - Legacy & Archive:
+      - Legacy Architecture Redirect: architecture.md
+      - Legacy Ecosystem Redirect: ecosystem.md
+      - Legacy Concepts Redirect: concepts.md
+      - Legacy Optimization Redirect: optimization.md
+      - Legacy Quickstart Redirect: quickstart.md
+      - Legacy API Quickstart Redirect: api/quickstart.md
+      - Notebooks and Learning Path: notebooks.md
+      - Backends (Legacy API page): api/backends.md
+      - Coupling Analysis (Legacy API page): api/coupling-analysis.md
+      - Execution Capabilities (Legacy API page): api/execution-capabilities.md
+      - Precision Timing (Coming Soon): precision-timing/index.md
+      - Quantum Communication (Coming Soon): quantum-communication/index.md
