@@ -1,0 +1,66 @@
+{
+  "version": "1.0.0",
+  "canonical_docs_url": "https://docs.rqmtechnologies.com/agents/contract/",
+  "required_entrypoints": [
+    "/llms.txt",
+    "/agents/",
+    "/agents/recipes/"
+  ],
+  "required_manifests": [
+    "/capabilities.json",
+    "/agent-tasks.json"
+  ],
+  "required_behaviors": [
+    "Read /llms.txt first.",
+    "Read /capabilities.json and /agent-tasks.json before selecting a workflow.",
+    "Use Agent Recipes before inventing custom flows.",
+    "Confirm exact routes/schemas in Swagger UI when implementation requires exact API shape.",
+    "Validate circuit payloads before optimize/analyze flows.",
+    "Preserve request/response artifacts.",
+    "Preserve metadata where available.",
+    "Label research-only concepts clearly.",
+    "Avoid physical or quantum advantage claims without documented benchmark/output artifacts."
+  ],
+  "forbidden_behaviors": [
+    "Invent undocumented endpoints.",
+    "Treat internal IR as public API contract.",
+    "Present research concepts as production guarantees.",
+    "Drop unknown fields silently.",
+    "Claim performance improvement without reproducible evidence.",
+    "Treat RQM Studio as canonical computation layer."
+  ],
+  "required_artifacts": [
+    "validation_request.json",
+    "validation_response.json",
+    "analyze_or_optimize_request.json",
+    "analyze_or_optimize_response.json",
+    "verification_or_metrics_artifact.json",
+    "artifact_index.json"
+  ],
+  "contract_tests": [
+    "agent_reads_llms_first",
+    "agent_checks_capabilities_manifest",
+    "agent_checks_task_manifest",
+    "agent_uses_recipe_before_custom_flow",
+    "agent_validates_before_optimize",
+    "agent_does_not_invent_endpoint",
+    "agent_preserves_artifacts",
+    "agent_labels_research_as_research",
+    "agent_does_not_claim_advantage_without_evidence",
+    "agent_separates_studio_from_api_boundary"
+  ],
+  "status_labels": [
+    "production",
+    "beta",
+    "research",
+    "planned"
+  ],
+  "pass_fail_policy": {
+    "pass": "All required behaviors are met and no forbidden behavior is present.",
+    "fail": [
+      "Any forbidden behavior is present.",
+      "Validate-before-optimize requirement is violated.",
+      "Undocumented endpoint/schema is presented as official."
+    ]
+  }
+}

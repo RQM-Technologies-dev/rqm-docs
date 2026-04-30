@@ -60,3 +60,11 @@ You are implementing against RQM.
 - [Generate an RQM API Client](recipes/client-generation.md)
 - [Production vs Research Boundary](recipes/research-boundary.md)
 - Machine-readable task manifest: [`/agent-tasks.json`](../agent-tasks.json)
+
+
+## Compliance layer
+
+- [Agent Contract](contract.md)
+- [Agent Compliance Checklist](contract-checklist.md)
+- [Agent Contract Tests](contract-tests.md)
+- Machine-readable contract manifest: [`/agent-contract.json`](../agent-contract.json)

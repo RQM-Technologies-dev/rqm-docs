@@ -72,5 +72,11 @@
   "example_fixtures": [
     "/examples/agent-circuit-validation.placeholder.json",
     "/examples/agent-optimization-request.placeholder.json"
+  ],
+  "agent_contract": "/agent-contract.json",
+  "compliance_docs": [
+    "/agents/contract/",
+    "/agents/contract-checklist/",
+    "/agents/contract-tests/"
   ]
 }
