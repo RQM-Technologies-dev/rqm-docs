@@ -1,12 +1,12 @@
-<div class="rqm-home">
+<div class="rqm-home" markdown="1">
 
-<div class="rqm-card rqm-hero rqm-grid" markdown>
+<div class="rqm-card rqm-hero rqm-grid" markdown="1">
 
 # RQM Platform
 
 Agent-ready quantum software documentation for circuit validation, optimization, execution routing, and geometry-native analysis.
 
-<div class="rqm-button-row" markdown>
+<div class="rqm-button-row" markdown="1">
 
 [:material-robot-outline: Connect an Agent](agents/index.md){ .md-button .md-button--primary }
 [:material-file-document-outline: Read llms.txt](llms.txt){ .md-button }
@@ -21,11 +21,11 @@ Agent-ready quantum software documentation for circuit validation, optimization,
 
 RQM keeps the public integration boundary explicit while giving developers and coding agents clear paths to validate circuits, run optimization workflows, and route execution through documented bridges.
 
-<div class="rqm-cols-3" markdown>
+<div class="rqm-cols-3" markdown="1">
 
-<div class="rqm-card" markdown>
+<div class="rqm-card" markdown="1">
 
-### Agent Connect
+<h3>Agent Connect</h3>
 
 Start with machine-readable docs and implementation guidance for coding assistants.
 
@@ -35,9 +35,9 @@ Start with machine-readable docs and implementation guidance for coding assistan
 
 </div>
 
-<div class="rqm-card" markdown>
+<div class="rqm-card" markdown="1">
 
-### API + Circuit Boundary
+<h3>API + Circuit Boundary</h3>
 
 Build against the documented API and canonical public circuit schema.
 
@@ -47,9 +47,9 @@ Build against the documented API and canonical public circuit schema.
 
 </div>
 
-<div class="rqm-card" markdown>
+<div class="rqm-card" markdown="1">
 
-### Verification + Trust
+<h3>Verification + Trust</h3>
 
 Use trust and verification pages to understand proof-gated and fail-closed behavior.
 
@@ -61,15 +61,15 @@ Use trust and verification pages to understand proof-gated and fail-closed behav
 
 </div>
 
-### Architecture flow
+## Architecture flow
 
-<div class="rqm-flow" markdown>
+<div class="rqm-flow" markdown="1">
 
 `Studio / SDK / Agent → rqm-api → rqm-circuits → rqm-compiler → execution bridges`
 
 </div>
 
-### Start by role
+## Start by role
 
 | Role | Start here |
 |---|---|
