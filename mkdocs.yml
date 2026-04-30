@@ -60,6 +60,7 @@ nav:
       - Contract Tests: agents/contract-tests.md
       - Agent Recipes:
           - Overview: agents/recipes/index.md
+          - README for Agents: agents/recipes/README-for-agents.md
           - Validate → Optimize: agents/recipes/validate-optimize.md
           - RQM Studio Workflow: agents/recipes/studio-workflow.md
           - API Client Generation: agents/recipes/client-generation.md
