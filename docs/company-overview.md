@@ -1,6 +1,6 @@
 # Company and Product Map
 
-RQM Technologies develops software and API-first capabilities for quantum workflow engineering, with theory-informed methods grounded in quaternionic and SU(2) geometry.
+RQM Technologies develops software and API-first capabilities that give engineers and scientists a better coordinate system for waves and quantum states.
 
 This documentation site focuses on **what is currently documented for production or beta integration**, while keeping research and planned interfaces clearly labeled.
 
@@ -10,13 +10,17 @@ This documentation site focuses on **what is currently documented for production
 
 ```text
 RQM Technologies (company)
-  ├─ RQM Platform (documentation and integration surface)
-  │   ├─ rqm-api (service boundary)
-  │   ├─ rqm-circuits (public circuit boundary)
-  │   ├─ rqm-compiler (internal optimization engine)
-  │   ├─ execution bridges (qiskit / braket / pennylane)
-  │   └─ rqm-studio (workflow product layer)
-  └─ Research streams (theory notes, drafts, and planned interfaces)
+  ├─ Foundations
+  │   ├─ QSG: Quaternionic Spectral Geometry, the math foundation
+  │   └─ RQM: Resonant Quantum Mechanics, the quantum physics foundation
+  ├─ Product platforms
+  │   ├─ WaveEngine: signal-processing platform
+  │   └─ RQM Studio: quantum-computing platform
+  ├─ Developer libraries
+  │   ├─ rqm-* repositories for quantum workflows
+  │   └─ rqm-wave-* repositories for wave and signal workflows
+  └─ Internal theory work
+      └─ spectral-core: S³/SU(2) quantum-mechanics proof program
 ```
 
 ---
@@ -26,12 +30,15 @@ RQM Technologies (company)
 | Layer / Product | Current role in this docs site | Audience |
 |---|---|---|
 | **RQM Technologies** | Company umbrella for platform, product, and research efforts | Partners, evaluators, contributors |
-| **RQM Platform** | Core integration model and boundary architecture | Developers, coding agents |
-| **RQM Studio** | Browser workflow layer built on API services | Product users and workflow builders |
+| **QSG** | Mathematical foundation for wave shape, phase, rotation, polarization, spectra, and structure | Researchers, technical evaluators, proposal reviewers |
+| **RQM** | Quantum physics foundation for quantum-state structure and quantum workflows | Quantum researchers, compiler engineers, technical evaluators |
+| **WaveEngine** | Signal-processing product platform for signal propagation, EM propagation, wave analysis, channel awareness, and multichannel recovery | Signal, wireless, imaging, and wave-system teams |
+| **RQM Studio** | Browser workflow layer for compiler chat, circuit workflows, execution testing, and quantum scientist interfaces | Product users and workflow builders |
 | **rqm-api** | Public service boundary for validate/analyze/optimize/execution and account-linked flows | Integrators, backend/app developers |
 | **rqm-circuits** | Canonical public circuit schema and interchange boundary | SDK and API consumers |
 | **rqm-compiler** | Internal optimization/canonicalization engine (`u1q` internal) | Compiler engineers |
 | **Execution bridges** | Provider-specific lowering/routing surfaces | Teams integrating Qiskit, Braket, PennyLane |
+| **spectral-core** | Internal theory/proof program for S³/SU(2), resonance shells, spectral lines, and quantum-mechanics foundations | Research and proposal development |
 | **Theory / research notes** | Conceptual grounding and in-progress research narrative | Researchers and technical evaluators |
 
 ---
@@ -46,6 +53,14 @@ Use this model to interpret claims consistently:
 - **Planned/Proposed**: future-facing documentation, not available capability.
 
 If a page discusses research or planned material, treat it as non-contractual unless a production API surface explicitly documents availability.
+
+---
+
+## Language posture
+
+Use practical ecosystem language first. Prefer terms such as signal propagation, EM propagation, wave shape, phase, rotation, polarization, spectra, quantum states, compiler diagnostics, and execution workflows.
+
+QSG/RQM theory can be introduced after the user's job-to-be-done is clear.
 
 ---
 
