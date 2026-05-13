@@ -4,7 +4,7 @@
 
 # RQM Platform
 
-Agent-ready quantum software for validating, optimizing, and routing quantum circuits through geometry-native tooling.
+Agent-ready quantum software for validating, optimizing, and routing quantum circuits through tooling that understands quantum-state structure.
 
 **Do not learn the whole theory first. Enter through the problem you already have.**
 
@@ -42,7 +42,7 @@ Circuits are too large, too deep, or hard to reason about. Start by validating c
 
 <h3>2) I build with Qiskit, Braket, PennyLane, or other SDKs</h3>
 
-Use RQM as a geometry-native optimization and routing layer around your existing SDK workflow instead of replacing your stack.
+Use RQM as an optimization and routing layer around your existing SDK workflow instead of replacing your stack. RQM keeps quantum-state structure and SU(2) relationships visible for compiler diagnostics.
 
 - [Execution Bridges](platform/execution-bridges.md)
 - [Execution Workflows](products/execution-workflows.md)
